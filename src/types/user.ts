@@ -24,7 +24,7 @@ export type ILoginProps = {
 
 export type IRegisterProps = {
     firstName: string;
-    middleName: string;
+    mInit: string;
     lastName: string;
     phone: string;
     day: string;

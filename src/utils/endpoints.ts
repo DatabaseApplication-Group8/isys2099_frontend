@@ -28,8 +28,10 @@ export default {
         delete: ""
     },
     auth: {
-        login: "/login",
-        register: "/register",
+        login: "/auth/login",
+        register: "/auth/register",
     },
     
 }
+
+
