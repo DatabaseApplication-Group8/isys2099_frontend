@@ -8,7 +8,7 @@ import { IRegisterProps } from '@/types/user';
 export default function Register() {
     const [signUpForm, setsignUpForm] = useState<IRegisterProps>({
         firstName: '',
-        middleName: '',
+        mInit: '',
         lastName: '',
         phone: '',
         day: '',
@@ -146,12 +146,12 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="middleName" className="text-sm font-semibold text-[#1F2B6C]">Middle Name</label>
+                            <label htmlFor="mInit" className="text-sm font-semibold text-[#1F2B6C]">Middle Name</label>
                             <input
                                 required
                                 type="text"
-                                id="middleName"
-                                value={signUpForm.middleName}
+                                id="mInit"
+                                value={signUpForm.mInit}
                                 onChange={handleChange}
                                 placeholder="Enter your middle name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
