@@ -1,53 +1,111 @@
 "use client";
 import { useState } from 'react';
 import Header from '@/components/Header/Header';
+import { register } from '@/api/register.api';
+import { IRegisterProps } from '@/types/user';
+
 
 export default function Register() {
-    const [formData, setFormData] = useState({
+    const [signUpForm, setsignUpForm] = useState<IRegisterProps>({
         firstName: '',
         middleName: '',
         lastName: '',
         phone: '',
-        dob: '',
-        sex: '', // Keep as empty string to handle no selection case
+        day: '',
+        month: '',
+        year: '',
+        sex: '',
         email: '',
         address: '',
         password: '',
         passwordConfirm: '',
     });
 
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+    // Specify the type of the event parameter
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setsignUpForm({ ...signUpForm, [e.target.id]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    // Specify the type of the password parameter
+    const validatePassword = (password: string) => {
+        const errors: string[] = [];
+        if (password.length < 8) {
+            errors.push("Password must be at least 8 characters long.");
+        }
+        if (!/[A-Z]/.test(password)) {
+            errors.push("Password must contain at least one uppercase letter.");
+        }
+        if (!/[a-z]/.test(password)) {
+            errors.push("Password must contain at least one lowercase letter.");
+        }
+        if (!/[0-9]/.test(password)) {
+            errors.push("Password must contain at least one number.");
+        }
+        if (!/[^\w\s]/.test(password)) {
+            errors.push("Password must contain at least one special character.");
+        }
+        return errors;
+    };
+
+    const validateForm = () => {
+        let errors: string[] = [];
+        
+        if (!signUpForm.email.endsWith('@gmail.com')) {
+            errors.push("Email must end with '@gmail.com'.");
+        }
+        if (!/^\d{10}$/.test(signUpForm.phone)) {
+            errors.push("Phone number must be exactly 10 digits.");
+        }
+        if (!signUpForm.email.includes("@")) {
+            errors.push("Please enter a valid email.");
+        }
+        if (signUpForm.password !== signUpForm.passwordConfirm) {
+            errors.push("Passwords do not match.");
+        }
+        const passwordValidationErrors = validatePassword(signUpForm.password);
+        if (passwordValidationErrors.length > 0) {
+            errors = [...errors, ...passwordValidationErrors];
+        }
+        
+        if (errors.length > 0) {
+            setError(errors.join(" "));
+            return false;
+        }
+        
+        setError("");
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        // Basic validation
-        if (formData.password !== formData.passwordConfirm) {
-            setError("Passwords don't match.");
+        // Validate the form
+        if (!validateForm()) {
             setLoading(false);
             return;
         }
 
+        // Combine day, month, and year into dob
+        const dob = `${signUpForm.year}-${String(signUpForm.month).padStart(2, '0')}-${String(signUpForm.day).padStart(2, '0')}`;
+
         try {
             // Example register request (replace with actual API call)
-            const response = await fetch('/api/register', {
+            const response = await fetch('register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...signUpForm, dob }), // Include dob in request
             });
 
             if (response.ok) {
                 // Handle successful registration (e.g., redirect to login page)
-                window.location.href = '/login';
+                window.location.href = '/auth/login';
             } else {
                 const result = await response.json();
                 setError(result.message || 'An error occurred. Please try again later.');
@@ -58,6 +116,11 @@ export default function Register() {
             setLoading(false);
         }
     };
+
+    // Generate day, month, and year options
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const months = Array.from({ length: 12 }, (_, i) => i + 1);
+    const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
     return (
         <div className="register min-h-screen flex flex-col bg-[#F5F8FF]">
@@ -75,7 +138,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="firstName"
-                                value={formData.firstName}
+                                value={signUpForm.firstName}
                                 onChange={handleChange}
                                 placeholder="Enter your first name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -88,7 +151,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="middleName"
-                                value={formData.middleName}
+                                value={signUpForm.middleName}
                                 onChange={handleChange}
                                 placeholder="Enter your middle name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -101,7 +164,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="lastName"
-                                value={formData.lastName}
+                                value={signUpForm.lastName}
                                 onChange={handleChange}
                                 placeholder="Enter your last name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -114,24 +177,54 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="phone"
-                                value={formData.phone}
+                                value={signUpForm.phone}
                                 onChange={handleChange}
                                 placeholder="Enter your phone"
+                                maxLength={10}
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             />
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="dob" className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
-                            <input
-                                required
-                                type="text"
-                                id="dob"
-                                value={formData.dob}
-                                onChange={handleChange}
-                                placeholder="Date of Birth"
-                                className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                            />
+                            <label className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
+                            <div className="grid grid-cols-3 gap-4">
+                                <select
+                                    required
+                                    id="day"
+                                    value={signUpForm.day}
+                                    onChange={handleChange}
+                                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                >
+                                    <option value="" disabled>Day</option>
+                                    {days.map(day => (
+                                        <option key={day} value={day}>{day}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    required
+                                    id="month"
+                                    value={signUpForm.month}
+                                    onChange={handleChange}
+                                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                >
+                                    <option value="" disabled>Month</option>
+                                    {months.map(month => (
+                                        <option key={month} value={month}>{month}</option>
+                                    ))}
+                                </select>
+                                <select
+                                    required
+                                    id="year"
+                                    value={signUpForm.year}
+                                    onChange={handleChange}
+                                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                >
+                                    <option value="" disabled>Year</option>
+                                    {years.map(year => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
 
                         <div className='flex flex-col space-y-2'>
@@ -139,13 +232,14 @@ export default function Register() {
                             <select
                                 required
                                 id="sex"
-                                value={formData.sex}
+                                value={signUpForm.sex}
                                 onChange={handleChange}
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             >
-                                <option value="" disabled>Select your gender</option>
-                                <option value="Female">Female</option>
-                                <option value="Male">Male</option>
+                                <option value="" disabled>Select your sex</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
 
@@ -153,9 +247,9 @@ export default function Register() {
                             <label htmlFor="email" className="text-sm font-semibold text-[#1F2B6C]">Email</label>
                             <input
                                 required
-                                type="text"
+                                type="email"
                                 id="email"
-                                value={formData.email}
+                                value={signUpForm.email}
                                 onChange={handleChange}
                                 placeholder="Enter your email"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -168,7 +262,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="address"
-                                value={formData.address}
+                                value={signUpForm.address}
                                 onChange={handleChange}
                                 placeholder="Enter your address"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -181,7 +275,7 @@ export default function Register() {
                                 required
                                 type="password"
                                 id="password"
-                                value={formData.password}
+                                value={signUpForm.password}
                                 onChange={handleChange}
                                 placeholder="Enter your password"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -194,25 +288,23 @@ export default function Register() {
                                 required
                                 type="password"
                                 id="passwordConfirm"
-                                value={formData.passwordConfirm}
+                                value={signUpForm.passwordConfirm}
                                 onChange={handleChange}
                                 placeholder="Confirm your password"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             />
                         </div>
-                    </form>
 
-                    <div className="flex justify-center mt-8">
-                        <button
-                            onClick={handleSubmit}
-                            disabled={loading}
-                            className="h-[45px] w-full md:w-auto px-6 py-2 border-solid border-[3px] border-[#C5DCFF]
-                                text-[#1F2B6C] bg-white rounded-md hover:bg-[#1F2B6C] hover:text-white hover:border-0
-                                focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            {loading ? 'Registering...' : 'Register'}
-                        </button>
-                    </div>
+                        <div className="col-span-2 flex justify-center">
+                            <button
+                                type="submit"
+                                className={`p-3 rounded-md text-white ${loading ? 'bg-gray-400' : 'bg-[#1F2B6C] hover:bg-[#1F2B6C]'} transition duration-300`}
+                                disabled={loading}
+                            >
+                                {loading ? 'Submitting...' : 'Register'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </main>
         </div>
