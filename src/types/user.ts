@@ -33,6 +33,7 @@ export type IRegisterProps = {
     sex: string;
     email: string;
     address: string;
+    allergies: string;
     password: string;
     passwordConfirm: string;
 }

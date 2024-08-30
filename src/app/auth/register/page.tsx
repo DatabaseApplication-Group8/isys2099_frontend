@@ -17,6 +17,7 @@ export default function Register() {
         sex: '',
         email: '',
         address: '',
+        allergies: '',
         password: '',
         passwordConfirm: '',
     });
@@ -52,7 +53,7 @@ export default function Register() {
 
     const validateForm = () => {
         let errors: string[] = [];
-        
+
         if (!formData.email.endsWith('@gmail.com')) {
             errors.push("Email must end with '@gmail.com'.");
         }
@@ -69,12 +70,12 @@ export default function Register() {
         if (passwordValidationErrors.length > 0) {
             errors = [...errors, ...passwordValidationErrors];
         }
-        
+
         if (errors.length > 0) {
             setError(errors.join(" "));
             return false;
         }
-        
+
         setError("");
         return true;
     };
@@ -90,9 +91,6 @@ export default function Register() {
             return;
         }
 
-        // Combine day, month, and year into dob
-        const dob = `${formData.year}-${String(formData.month).padStart(2, '0')}-${String(formData.day).padStart(2, '0')}`;
-
         try {
             const response = await fetch('register', {
                 method: 'POST',
@@ -103,7 +101,7 @@ export default function Register() {
             });
 
             if (response.ok) {
-                // Handle successful registration (e.g., redirect to login page)
+                // Handle successful registration
                 window.location.href = '/auth/login';
             } else {
                 const result = await response.json();
@@ -120,6 +118,8 @@ export default function Register() {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
     const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
+    // Combine day, month, and year into dob
+    const dob = `${formData.year}-${String(formData.month).padStart(2, '0')}-${String(formData.day).padStart(2, '0')}`;
 
     return (
         <div className="register min-h-screen flex flex-col bg-[#F5F8FF]">
@@ -258,7 +258,7 @@ export default function Register() {
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="address" className="text-sm font-semibold text-[#1F2B6C]">Address</label>
                             <input
-                                required
+
                                 type="text"
                                 id="address"
                                 value={formData.address}
@@ -269,30 +269,46 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">Password</label>
+                            <label htmlFor="allergies" className="text-sm font-semibold text-[#1F2B6C]">Allergies</label>
                             <input
-                                required
-                                type="password"
-                                id="password"
-                                value={formData.password}
+
+                                type="text"
+                                id="allergies"
+                                value={formData.allergies}
                                 onChange={handleChange}
-                                placeholder="Enter your password"
+                                placeholder="Enter your allergies"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             />
                         </div>
 
-                        <div className='flex flex-col space-y-2'>
-                            <label htmlFor="passwordConfirm" className="text-sm font-semibold text-[#1F2B6C]">Confirm Password</label>
-                            <input
-                                required
-                                type="password"
-                                id="passwordConfirm"
-                                value={formData.passwordConfirm}
-                                onChange={handleChange}
-                                placeholder="Confirm your password"
-                                className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                            />
+                        <div className="flex flex-col space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-6">
+                            <div className='flex flex-col space-y-2'>
+                                <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">Password</label>
+                                <input
+                                    required
+                                    type="password"
+                                    id="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="Enter your password"
+                                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                />
+                            </div>
+
+                            <div className='flex flex-col space-y-2'>
+                                <label htmlFor="passwordConfirm" className="text-sm font-semibold text-[#1F2B6C]">Confirm Password</label>
+                                <input
+                                    required
+                                    type="password"
+                                    id="passwordConfirm"
+                                    value={formData.passwordConfirm}
+                                    onChange={handleChange}
+                                    placeholder="Confirm your password"
+                                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                />
+                            </div>
                         </div>
+
 
                         <div className="col-span-2 flex justify-center">
                             <button
