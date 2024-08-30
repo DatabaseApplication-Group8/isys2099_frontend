@@ -25,7 +25,7 @@ export default function Login() {
         const loginData: ILoginProps = { email, password };
 
         try {
-            const response = await fetch('login', {
+            const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export default function Login() {
         <div className="login min-h-screen flex flex-col">
             <Header />
             <main className="flex flex-col flex-grow bg-white p-8 justify-center items-center">
-                <div className='container p-8 rounded-md w-[50%] bg-[#BFD2F8] bg-opacity-[50%] shadow-md'>
+                <div className='container p-12 rounded-md w-[50%] bg-[#BFD2F8] bg-opacity-[50%] shadow-md'>
                     <div className="flex justify-center">
                         <h1 className="text-3xl font-bold mb-8 text-[#1F2B6C]">Login to your account</h1>
                     </div>

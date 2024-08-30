@@ -1,12 +1,12 @@
 "use client";
 import { useState } from 'react';
 import Header from '@/components/Header/Header';
-import { register } from '@/api/register.api';
+import { registerAccount } from '@/api/register.api';
 import { IRegisterProps } from '@/types/user';
 
 
 export default function Register() {
-    const [signUpForm, setsignUpForm] = useState<IRegisterProps>({
+    const [formData, setformData] = useState<IRegisterProps>({
         firstName: '',
         mInit: '',
         lastName: '',
@@ -26,7 +26,7 @@ export default function Register() {
 
     // Specify the type of the event parameter
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setsignUpForm({ ...signUpForm, [e.target.id]: e.target.value });
+        setformData({ ...formData, [e.target.id]: e.target.value });
     };
 
     // Specify the type of the password parameter
@@ -53,19 +53,19 @@ export default function Register() {
     const validateForm = () => {
         let errors: string[] = [];
         
-        if (!signUpForm.email.endsWith('@gmail.com')) {
+        if (!formData.email.endsWith('@gmail.com')) {
             errors.push("Email must end with '@gmail.com'.");
         }
-        if (!/^\d{10}$/.test(signUpForm.phone)) {
+        if (!/^\d{10}$/.test(formData.phone)) {
             errors.push("Phone number must be exactly 10 digits.");
         }
-        if (!signUpForm.email.includes("@")) {
+        if (!formData.email.includes("@")) {
             errors.push("Please enter a valid email.");
         }
-        if (signUpForm.password !== signUpForm.passwordConfirm) {
+        if (formData.password !== formData.passwordConfirm) {
             errors.push("Passwords do not match.");
         }
-        const passwordValidationErrors = validatePassword(signUpForm.password);
+        const passwordValidationErrors = validatePassword(formData.password);
         if (passwordValidationErrors.length > 0) {
             errors = [...errors, ...passwordValidationErrors];
         }
@@ -91,16 +91,15 @@ export default function Register() {
         }
 
         // Combine day, month, and year into dob
-        const dob = `${signUpForm.year}-${String(signUpForm.month).padStart(2, '0')}-${String(signUpForm.day).padStart(2, '0')}`;
+        const dob = `${formData.year}-${String(formData.month).padStart(2, '0')}-${String(formData.day).padStart(2, '0')}`;
 
         try {
-            // Example register request (replace with actual API call)
             const response = await fetch('register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ ...signUpForm, dob }), // Include dob in request
+                body: JSON.stringify({ ...formData, dob }), // Include dob in request
             });
 
             if (response.ok) {
@@ -138,7 +137,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="firstName"
-                                value={signUpForm.firstName}
+                                value={formData.firstName}
                                 onChange={handleChange}
                                 placeholder="Enter your first name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -151,7 +150,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="mInit"
-                                value={signUpForm.mInit}
+                                value={formData.mInit}
                                 onChange={handleChange}
                                 placeholder="Enter your middle name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -164,7 +163,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="lastName"
-                                value={signUpForm.lastName}
+                                value={formData.lastName}
                                 onChange={handleChange}
                                 placeholder="Enter your last name"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -177,7 +176,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="phone"
-                                value={signUpForm.phone}
+                                value={formData.phone}
                                 onChange={handleChange}
                                 placeholder="Enter your phone"
                                 maxLength={10}
@@ -191,7 +190,7 @@ export default function Register() {
                                 <select
                                     required
                                     id="day"
-                                    value={signUpForm.day}
+                                    value={formData.day}
                                     onChange={handleChange}
                                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                                 >
@@ -203,7 +202,7 @@ export default function Register() {
                                 <select
                                     required
                                     id="month"
-                                    value={signUpForm.month}
+                                    value={formData.month}
                                     onChange={handleChange}
                                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                                 >
@@ -215,7 +214,7 @@ export default function Register() {
                                 <select
                                     required
                                     id="year"
-                                    value={signUpForm.year}
+                                    value={formData.year}
                                     onChange={handleChange}
                                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                                 >
@@ -232,7 +231,7 @@ export default function Register() {
                             <select
                                 required
                                 id="sex"
-                                value={signUpForm.sex}
+                                value={formData.sex}
                                 onChange={handleChange}
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             >
@@ -249,7 +248,7 @@ export default function Register() {
                                 required
                                 type="email"
                                 id="email"
-                                value={signUpForm.email}
+                                value={formData.email}
                                 onChange={handleChange}
                                 placeholder="Enter your email"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -262,7 +261,7 @@ export default function Register() {
                                 required
                                 type="text"
                                 id="address"
-                                value={signUpForm.address}
+                                value={formData.address}
                                 onChange={handleChange}
                                 placeholder="Enter your address"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -275,7 +274,7 @@ export default function Register() {
                                 required
                                 type="password"
                                 id="password"
-                                value={signUpForm.password}
+                                value={formData.password}
                                 onChange={handleChange}
                                 placeholder="Enter your password"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -288,7 +287,7 @@ export default function Register() {
                                 required
                                 type="password"
                                 id="passwordConfirm"
-                                value={signUpForm.passwordConfirm}
+                                value={formData.passwordConfirm}
                                 onChange={handleChange}
                                 placeholder="Confirm your password"
                                 className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"

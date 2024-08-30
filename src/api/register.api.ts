@@ -2,7 +2,7 @@ import { IRegisterProps } from "@/types/user"; // Adjust import based on your ty
 import endpoints from "@/utils/endpoints";
 import fetcher from "@/utils/fetcher";
 
-export const register = async (formData: IRegisterProps) => {
+export const registerAccount = async (formData: IRegisterProps) => {
     try {
         const response = await fetcher.post(endpoints.auth.register, formData);
         console.log("Response after registration: ", response);
