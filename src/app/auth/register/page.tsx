@@ -13,9 +13,6 @@ export default function Register() {
         mInit: '',
         lastName: '',
         phone: '',
-        day: '',
-        month: '',
-        year: '',
         dob: '',
         sex: '',
         email: '',
@@ -83,15 +80,7 @@ export default function Register() {
         const { id, value } = e.target;
         setFormData(prevFormData => {
             const updatedFormData = { ...prevFormData, [id]: value };
-            // Update dob when day, month, or year changes
-            if (id === 'day' || id === 'month' || id === 'year') {
-                const day = updatedFormData.day || '01';
-                const month = updatedFormData.month || '01';
-                const year = updatedFormData.year || '1970';
-                if (day && month && year) {
-                    updatedFormData.dob = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                }
-            }
+            
             return updatedFormData;
         });
     };
@@ -144,11 +133,6 @@ export default function Register() {
         setError("");
         return true;
     };
-
-    // Generate day, month, and year options
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-    const months = Array.from({ length: 12 }, (_, i) => i + 1);
-    const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
     return (
         <div className="register min-h-screen flex flex-col bg-[#F5F8FF]">
@@ -213,58 +197,42 @@ export default function Register() {
 
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="sex" className="text-sm font-semibold text-[#1F2B6C]">Sex</label>
-                            <select
-                                required
-                                id="sex"
-                                value={formData.sex}
-                                onChange={handleChange}
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                            >
-                                <option value="" disabled>Select your sex</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
+                            <div className='relative'>
+                                <select
+                                    required
+                                    id="sex"
+                                    name="sex"  // Consider adding the name attribute if handling form submission
+                                    value={formData.sex}
+                                    onChange={handleChange}
+                                    className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                >
+                                    <option value="" disabled>Select your sex</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="day" className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
-                            <div className="grid grid-cols-3 gap-4">
-                                <select
-                                    id="day"
-                                    value={formData.day}
-                                    onChange={handleChange}
-                                    className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                                >
-                                    <option value="">Day</option>
-                                    {days.map(day => (
-                                        <option key={day} value={day}>{day}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    id="month"
-                                    value={formData.month}
-                                    onChange={handleChange}
-                                    className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                                >
-                                    <option value="">Month</option>
-                                    {months.map(month => (
-                                        <option key={month} value={month}>{month}</option>
-                                    ))}
-                                </select>
-                                <select
-                                    id="year"
-                                    value={formData.year}
-                                    onChange={handleChange}
-                                    className="p-3 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                                >
-                                    <option value="">Year</option>
-                                    {years.map(year => (
-                                        <option key={year} value={year}>{year}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            <label htmlFor="dob" className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
+                            <input
+                                required
+                                id="dob"
+                                type="date"
+                                value={formData.dob}
+                                onChange={handleChange}
+                                min="1900-01-01"
+                                max={new Date().toISOString().split('T')[0]}
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                            />
                         </div>
+
 
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="email" className="text-sm font-semibold text-[#1F2B6C]">Email</label>

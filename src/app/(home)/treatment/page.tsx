@@ -1,14 +1,11 @@
-
 "use client";
 import { useState, useEffect } from 'react';
-import "./appointment.scss"
 
-export default function Appointment() {
+export default function Treatment() {
     const [formData, setFormData] = useState({
         date: '',
         time: '',
-        doctor: '',
-        note: ''
+        doctor: ''
     });
 
     const [timeConstraints, setTimeConstraints] = useState({
@@ -59,11 +56,11 @@ export default function Appointment() {
     };
 
     return (
-        <div className="appointment min-h-screen flex flex-col bg-[#F5F8FF]">
-            <main className="flex flex-col flex-grow bg-white p-8 justify-center items-center">
+        <div className="treatment min-h-screen flex flex-col bg-[#F5F8FF]">
+            <main className="treatment flex flex-col flex-grow bg-white p-8 justify-center items-center">
                 <div className="container px-[70px] py-12 max-w-2xl rounded-lg bg-[#BFD2F8] bg-opacity-[50%] shadow-lg">
                     <div className="flex justify-center mb-8">
-                        <h1 className="text-3xl font-bold text-[#1F2B6C]">Make an Appointment</h1>
+                        <h1 className="text-3xl font-bold text-[#1F2B6C]">Book Treatment</h1>
                     </div>
 
                     <form className="container-content grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
@@ -113,19 +110,7 @@ export default function Appointment() {
                                 </svg>
                             </div>
                             </div>
-                        </div>
-
-                        <div className='flex flex-col space-y-2'>
-                            <label htmlFor="note" className="text-sm font-semibold text-[#1F2B6C]">Add note</label>
-                            <input
-                                required
-                                type="text"
-                                id="note"
-                                value={formData.note}
-                                onChange={handleChange}
-                                placeholder="Add your note"
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                            />
+                            
                         </div>
 
                         <div className="flex justify-center">
@@ -136,19 +121,20 @@ export default function Appointment() {
                                         hover:bg-[#1F2B6C] hover:text-white hover:border-0
                                         focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                Make an Appointment
+                                Book Treatment
                             </button>
                         </div>
 
                         <div className="flex justify-center">
                             <button
                                 type="button"
+                                // Add functionality for View Treatment button if needed
                                 className="h-[45px] w-full border-solid border-[3px] border-[#C5DCFF] rounded-md
                                         text-[#1F2B6C] bg-white items-center justify-center
                                         hover:bg-[#1F2B6C] hover:text-white hover:border-0
                                         focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                View Appointment
+                                View Treatment
                             </button>
                         </div>
                     </form>

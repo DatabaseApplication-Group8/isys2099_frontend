@@ -28,9 +28,6 @@ export type IRegisterProps = {
     mInit: string;
     lastName: string;
     phone: string;
-    day: string;    
-    month: string;
-    year: string;
     dob: string;
     sex: string;
     email: string;
