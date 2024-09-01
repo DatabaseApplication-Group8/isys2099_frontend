@@ -17,6 +17,9 @@ export default function Treatment() {
         maxDate: ''
     });
 
+    const [doctorAvailableList, setDoctorAvailableList] = useState([]);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
     useEffect(() => {
         // Get today's date in YYYY-MM-DD format
         const today = new Date();
@@ -53,6 +56,24 @@ export default function Treatment() {
         event.preventDefault();
         // Handle form submission logic here
         console.log('Form submitted with data:', formData);
+
+        setSuccessMessage(`
+            You have successfully made an appointment on <span style="color: red;">${formData.date || 'N/A'}</span><br/>
+            At: <span style="color: red;">${formData.time || 'N/A'}</span> <br/>
+            With doctor: <span style="color: red;">${formData.doctor || 'N/A'}</span><br/>
+        `);
+
+        // Reset form data
+        setFormData({
+            date: '',
+            time: '',
+            doctor: ''
+        });
+
+        setTimeout(() => {
+            setSuccessMessage('');
+        }, 10000); // Message will disappear after 10 seconds
+
     };
 
     return (
@@ -95,15 +116,16 @@ export default function Treatment() {
                             <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">Select Doctor</label>
                             <div className='relative'>
                             <select
-                                id="doctor"
-                                value={formData.doctor}
-                                onChange={handleChange}
-                                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] bg-white appearance-none"
-                            >
-                                <option value="">Select Doctor</option>
-                                <option value="doctor1">Doctor 1</option>
-                                <option value="doctor2">Doctor 2</option>
-                            </select>
+                                    id="doctor"
+                                    value={formData.doctor}
+                                    onChange={handleChange}
+                                    className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] bg-white appearance-none"
+                                >
+                                    <option value="">Select Doctor</option>
+                                    {doctorAvailableList.map(doctor => (
+                                        <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+                                    ))}
+                                </select>
                             <div className="absolute inset-y-0 right-[1rem] flex items-center pointer-events-none">
                                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
@@ -113,13 +135,20 @@ export default function Treatment() {
                             
                         </div>
 
+                        {successMessage && (
+                            <div
+                                className="mt-4 p-4 border border-green-500 rounded text-green-700 bg-green-100"
+                                dangerouslySetInnerHTML={{ __html: successMessage }}
+                            />
+                        )}
+
                         <div className="flex justify-center">
                             <button
                                 type="submit"
-                                className="h-[45px] w-full mt-4 border-solid border-[3px] border-[#C5DCFF] rounded-md
-                                        text-[#1F2B6C] bg-white items-center justify-center
-                                        hover:bg-[#1F2B6C] hover:text-white hover:border-0
-                                        focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="h-[45px] w-full mt-4 border border-[#C5DCFF] rounded-md
+                                            bg-[#1F2B6C] text-white
+                                            hover:bg-[#1D3F7F] hover:shadow-lg 
+                                            focus:outline-none focus:ring-2 focus:ring-blue-50"
                             >
                                 Book Treatment
                             </button>
@@ -128,10 +157,9 @@ export default function Treatment() {
                         <div className="flex justify-center">
                             <button
                                 type="button"
-                                // Add functionality for View Treatment button if needed
                                 className="h-[45px] w-full border-solid border-[3px] border-[#C5DCFF] rounded-md
                                         text-[#1F2B6C] bg-white items-center justify-center
-                                        hover:bg-[#1F2B6C] hover:text-white hover:border-0
+                                        hover:shadow-lg     
                                         focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 View Treatment

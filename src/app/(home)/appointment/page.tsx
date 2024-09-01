@@ -7,12 +7,13 @@ export default function Appointment() {
         date: '',
         startTime: '',
         endTime: '',
-        doctor: '',
+        staff: '',
         note: ''
     });
 
     const [timeConstraints, setTimeConstraints] = useState({
-        minTime: ''
+        minTime: '',
+        maxEndTime: ''
     });
 
     const [dateConstraints, setDateConstraints] = useState({
@@ -20,12 +21,26 @@ export default function Appointment() {
         maxDate: ''
     });
 
+    const [staffAvailableList, setStaffAvailableList] = useState([]);
+
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
     useEffect(() => {
-        // Get today's date in YYYY-MM-DD format
+        const fetchStaff = async () => {
+            try {
+                const response = await fetch('/api/staff'); // Replace with your API endpoint
+                const data = await response.json();
+                setStaffAvailableList(data);
+            } catch (error) {
+                console.error('Error fetching staff:', error);
+            }
+        };
+
+        fetchStaff();
+
         const today = new Date();
         const minDate = today.toISOString().split('T')[0];
 
-        // Set the maximum date to 2 weeks from today
         const maxDate = new Date();
         maxDate.setDate(today.getDate() + 14);
         const maxDateString = maxDate.toISOString().split('T')[0];
@@ -35,14 +50,20 @@ export default function Appointment() {
             maxDate: maxDateString
         });
 
-        // Get current time in HH:MM format
         const now = new Date();
-        const minTime = now.toTimeString().split(' ')[0].slice(0, 5); // Extract HH:MM
+        const minTime = now.toTimeString().split(' ')[0].slice(0, 5);
 
         setTimeConstraints({
-            minTime
+            minTime,
+            maxEndTime: '' // Initial empty maxEndTime
         });
+
+        // Debugging dates and times
+        console.log("Minimum Date:", minDate);
+        console.log("Maximum Date:", maxDateString);
+        console.log("Current Time:", minTime);
     }, []);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
@@ -52,17 +73,16 @@ export default function Appointment() {
                 [id]: value
             };
 
-            // Update end time constraints based on start time
             if (id === 'startTime') {
                 const startTime = new Date(`${newData.date}T${value}`);
-                const minEndTime = startTime.toISOString().split('T')[1].slice(0, 5);
+                const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000) // Add 2 hours
+                    .toISOString().split('T')[1].slice(0, 5);
 
-                // Ensure end time is always after start time
-                if (newData.endTime <= minEndTime) {
-                    newData.endTime = minEndTime;
-                }
-
-                return { ...newData, minEndTime };
+                return {
+                    ...newData,
+                    endTime: newData.endTime <= value ? '' : newData.endTime,
+                    maxEndTime
+                };
             }
 
             return newData;
@@ -72,7 +92,6 @@ export default function Appointment() {
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
 
-        // Validate time inputs
         const startTime = new Date(`${formData.date}T${formData.startTime}`);
         const endTime = new Date(`${formData.date}T${formData.endTime}`);
 
@@ -81,8 +100,29 @@ export default function Appointment() {
             return;
         }
 
-        // Handle form submission logic here
         console.log('Form submitted with data:', formData);
+
+        setSuccessMessage(`
+            You have successfully made an appointment on <span style="color: red;">${formData.date || 'N/A'}</span><br/>
+            Start from: <span style="color: red;">${formData.startTime || 'N/A'}</span> to <span style="color: red;">${formData.endTime || 'N/A'}</span><br/>
+            With staff: <span style="color: red;">${formData.staff || 'N/A'}</span><br/>
+            Note: <span style="color: red;">${formData.note || 'N/A'}</span>
+        `);
+
+        // Reset form data
+        setFormData({
+            date: '',
+            startTime: '',
+            endTime: '',
+            staff: '',
+            note: ''
+        });
+
+        setTimeout(() => {
+            setSuccessMessage('');
+        }, 10000); // Message will disappear after 10 seconds
+
+
     };
 
     return (
@@ -129,23 +169,25 @@ export default function Appointment() {
                                 id="endTime"
                                 value={formData.endTime}
                                 onChange={handleChange}
-                                min={formData.startTime || timeConstraints.minTime}
+                                min={formData.startTime}
+                                max={timeConstraints.maxEndTime}
                                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             />
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">Select Doctor</label>
+                            <label htmlFor="staff" className="text-sm font-semibold text-[#1F2B6C]">Select Staff</label>
                             <div className='relative'>
                                 <select
-                                    id="doctor"
-                                    value={formData.doctor}
+                                    id="staff"
+                                    value={formData.staff}
                                     onChange={handleChange}
                                     className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] bg-white appearance-none"
                                 >
-                                    <option value="">Select Doctor</option>
-                                    <option value="doctor1">Doctor 1</option>
-                                    <option value="doctor2">Doctor 2</option>
+                                    <option value="">Select Staff</option>
+                                    {staffAvailableList.map(staff => (
+                                        <option key={staff.id} value={staff.id}>{staff.name}</option>
+                                    ))}
                                 </select>
                                 <div className="absolute inset-y-0 right-[1rem] flex items-center pointer-events-none">
                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -167,13 +209,20 @@ export default function Appointment() {
                             />
                         </div>
 
+                        {successMessage && (
+                            <div
+                                className="mt-4 p-4 border border-green-500 rounded text-green-700 bg-green-100"
+                                dangerouslySetInnerHTML={{ __html: successMessage }}
+                            />
+                        )}
+
                         <div className="flex justify-center">
                             <button
                                 type="submit"
-                                className="h-[45px] w-full mt-4 border-solid border-[3px] border-[#C5DCFF] rounded-md
-                                        text-[#1F2B6C] bg-white items-center justify-center
-                                        hover:bg-[#1F2B6C] hover:text-white hover:border-0
-                                        focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="h-[45px] w-full mt-4 border border-[#C5DCFF] rounded-md
+                                            bg-[#1F2B6C] text-white
+                                            hover:bg-[#1D3F7F] hover:shadow-lg 
+                                            focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 Make an Appointment
                             </button>
@@ -184,7 +233,7 @@ export default function Appointment() {
                                 type="button"
                                 className="h-[45px] w-full border-solid border-[3px] border-[#C5DCFF] rounded-md
                                         text-[#1F2B6C] bg-white items-center justify-center
-                                        hover:bg-[#1F2B6C] hover:text-white hover:border-0
+                                        hover:shadow-lg 
                                         focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 View Appointment
