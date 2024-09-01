@@ -186,7 +186,6 @@ export default function Register() {
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="mInit" className="text-sm font-semibold text-[#1F2B6C]">Middle Name</label>
                             <input
-                                required
                                 type="text"
                                 id="mInit"
                                 value={formData.mInit}

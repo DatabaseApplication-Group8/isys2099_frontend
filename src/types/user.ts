@@ -8,13 +8,18 @@ export type IPatient = {
 }
 
 export type IStaff = {
+    username: string;
     firstName: string,
     mInit: string,
     lastName: string,
     phone: string,
     email: string,
-    sex: CharacterData,
-    salary: Float32Array
+    dob: string,
+    sex: string,
+    password: string,
+    department: string,
+    salary: number,
+    qualification: string,
 }
 
 export type ILoginProps = {

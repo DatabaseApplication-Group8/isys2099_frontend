@@ -110,7 +110,12 @@ export default function Profile() {
                     <div className="bg-white p-6 rounded-lg shadow-lg">
                         <p className="text-gray-700 text-lg"><strong>Username:</strong> {user.username}</p>
                         <p className="text-gray-700 text-lg"><strong>Email:</strong> {user.email}</p>
-                        <p className="text-gray-700 text-lg"><strong>Role:</strong> {user.role}</p>
+                        <p className="text-gray-700 text-lg"><strong>Role:</strong> {user.role}
+                        {user.role === 3 ? ' - Patient' : 
+                        user.role === 2 ? ' - Staff' : 
+                        user.role === 1 ? ' - Admin' : 
+                        'Unknown Role'}
+                        </p>
                     </div>
                     <div className='flex justify-end mt-4'>
                         <button
