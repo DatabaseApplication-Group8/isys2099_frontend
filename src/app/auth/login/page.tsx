@@ -133,9 +133,9 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="h-[45px] w-full mt-4 border-solid border-[3px] border-[#C5DCFF] rounded-md
-                            text-[#1F2B6C] bg-white items-center justify-center
-                            hover:bg-[#1F2B6C] hover:text-white hover:border-0
+                className="h-[45px] w-full mt-4 border border-[#C5DCFF] rounded-md
+                          bg-[#1F2B6C] text-white
+                          hover:bg-[#1D3F7F] hover:shadow-lg 
                             focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {loading ? "Logging in..." : "Log In"}
