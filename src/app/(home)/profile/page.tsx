@@ -19,12 +19,11 @@ type Appointment = {
     date: string;
     startTime: string;
     staff: string;
-    status: 'pending' | 'confirmed' | 'canceled';
+    status: 'pending' | 'completed' | 'canceled';
 };
 
 export default function Profile() {
     const { user, setUser } = useUserContext();
-
     const [treatments, setTreatments] = useState<Treatment[]>([]);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -32,12 +31,23 @@ export default function Profile() {
     const [currentItemId, setCurrentItemId] = useState<string | null>(null);
     const [currentItemType, setCurrentItemType] = useState<'appointment' | 'treatment' | null>(null);
 
+    const handleLogout = () => {
+        localStorage.clear();
+        setUser({
+            username: "",
+            role: "",
+            email: "",
+            id: "",
+        });
+        window.location.href = "/";
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [treatmentResponse, appointmentResponse] = await Promise.all([
-                    axios.get('/api/treatments'),
-                    axios.get('/api/appointments')
+                    axios.post('/api/treatments'),
+                    axios.post('/api/appointments')
                 ]);
                 setTreatments(treatmentResponse.data);
                 setAppointments(appointmentResponse.data);
@@ -89,17 +99,6 @@ export default function Profile() {
                 closeModal();
             }
         }
-    };
-
-    const handleLogout = () => {
-        localStorage.clear();
-        setUser({
-            username: "",
-            role: "",
-            email: "",
-            id: "",
-        });
-        window.location.href = "/";
     };
 
     return (
