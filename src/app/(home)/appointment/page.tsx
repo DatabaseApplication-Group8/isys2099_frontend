@@ -4,7 +4,7 @@ import "./appointment.scss";
 
 export default function Appointment() {
     const [formData, setFormData] = useState({
-        meeting_date: '',
+        date: '',
         startTime: '',
         endTime: '',
         staff: '',
@@ -77,6 +77,25 @@ export default function Appointment() {
                 [id]: value
             };
 
+            if (id === 'date') {
+                const selectedDate = new Date(value);
+                const today = new Date();
+
+                if (selectedDate.toDateString() === today.toDateString()) {
+                    const now = new Date();
+                    const minTime = now.toTimeString().split(' ')[0].slice(0, 5);
+                    setTimeConstraints(prevConstraints => ({
+                        ...prevConstraints,
+                        minTime
+                    }));
+                } else {
+                    setTimeConstraints(prevConstraints => ({
+                        ...prevConstraints,
+                        minTime: '' // No minTime constraint for future dates
+                    }));
+                }
+            }
+
             if (id === 'startTime') {
                 const startTime = new Date(`${newData.date}T${value}`);
                 const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000) // Add 2 hours
@@ -107,7 +126,7 @@ export default function Appointment() {
         console.log('Form submitted with data:', formData);
 
         setSuccessMessage(`
-            You have successfully made an appointment on <span style="color: red;">${formData.meeting_date || 'N/A'}</span><br/>
+            You have successfully made an appointment on <span style="color: red;">${formData.date || 'N/A'}</span><br/>
             The purpose is about: <span style="color: red;">${formData.startTime || 'N/A'}</span> to <span style="color: red;">${formData.purpose || 'N/A'}</span><br/>
             Start from: <span style="color: red;">${formData.startTime || 'N/A'}</span> to <span style="color: red;">${formData.endTime || 'N/A'}</span><br/>
             With staff: <span style="color: red;">${formData.staff || 'N/A'}</span><br/>
@@ -118,7 +137,7 @@ export default function Appointment() {
 
         // Reset form data
         setFormData({
-            meeting_date: '',
+            date: '',
             startTime: '',
             endTime: '',
             staff: '',
@@ -151,7 +170,7 @@ export default function Appointment() {
                                 required
                                 type="date"
                                 id="date"
-                                value={formData.meeting_date}
+                                value={formData.date}
                                 onChange={handleChange}
                                 min={dateConstraints.minDate}
                                 max={dateConstraints.maxDate}

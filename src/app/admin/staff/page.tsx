@@ -62,9 +62,9 @@ export default function Staff() {
 
     return (
         <main className="staff bg-[#E6F0FF] min-h-screen pt-2">
-            <div className="container mx-auto">
-                <h1 className="text-3xl font-semibold mb-6 text-gray-900">Staff Database Management</h1>
-                <div className="flex flex-row justify-between mb-6">
+            <div className="container mx-auto px-4">
+            <h1 className="text-3xl mb-6 font-bold text-gray-900">Staff Database Management</h1>
+                <div className="flex flex-row justify-between ">
                     <div className="search-field">
                         <input
                             type="text"
@@ -109,12 +109,11 @@ export default function Staff() {
                             <tr>
                                 <th className="py-2 px-4 border-b">ID</th>
                                 <th className="py-2 px-4 border-b">Name</th>
-                                <th className="py-2 px-4 border-b">Role</th>
+                                <th className="py-2 px-4 border-b">Job</th>
                                 <th className="py-2 px-4 border-b">Email</th>
                                 <th className="py-2 px-4 border-b">Department</th>
                                 <th className="py-2 px-4 border-b">Qualification</th>
                                 <th className="py-2 px-4 border-b">Salary</th>
-                                <th className="py-2 px-4 border-b">Password</th>
                                 <th className="py-2 px-4 border-b">Actions</th>
                             </tr>
                         </thead>
@@ -124,12 +123,11 @@ export default function Staff() {
                                     <tr key={staff.id}>
                                         <td className="py-2 px-4 border-b">{staff.id}</td>
                                         <td className="py-2 px-4 border-b">{staff.firstName} {staff.lastName}</td>
-                                        <td className="py-2 px-4 border-b">{staff.role}</td>
+                                        <td className="py-2 px-4 border-b">{staff.job}</td>
                                         <td className="py-2 px-4 border-b">{staff.email}</td>
                                         <td className="py-2 px-4 border-b">{staff.department}</td>
                                         <td className="py-2 px-4 border-b">{staff.qualification}</td>
                                         <td className="py-2 px-4 border-b">{staff.salary}</td>
-                                        <td className="py-2 px-4 border-b">{staff.password}</td>
                                         <td className="py-2 px-4 border-b">
                                             <div className='flex flex-row'>
                                                 <button onClick={() => handleUpdateStaff(staff.id, { department: "Updated Department" })} className="bg-blue-600 text-white py-2 px-4 rounded-md mt-2 mr-2">
@@ -144,7 +142,7 @@ export default function Staff() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="9" className="py-2 px-4 text-center text-gray-500">
+                                    <td colSpan="8" className="py-2 px-4 text-center text-gray-500">
                                         No staff found.
                                     </td>
                                 </tr>
