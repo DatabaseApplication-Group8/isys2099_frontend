@@ -61,7 +61,7 @@ export default function Staff() {
     };
 
     return (
-        <main className="staff bg-[#E6F0FF] min-h-screen pt-2">
+        <main className="staff bg-[#E6F0FF] min-h-screen pt-4">
             <div className="container mx-auto px-4">
             <h1 className="text-3xl mb-6 font-bold text-gray-900">Staff Database Management</h1>
                 <div className="flex flex-row justify-between ">

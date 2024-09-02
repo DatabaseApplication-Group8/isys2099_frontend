@@ -190,7 +190,7 @@ export default function AdminDashboard() {
 
                 <div className="flex flex-row justify-between gap-2">
                     <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by Date Range</h2>
+                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
                         {dateRangeError && (
                             <div className="text-red-500 mb-2 text-end">
                                 {dateRangeError}
