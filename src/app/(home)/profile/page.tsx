@@ -11,14 +11,18 @@ type Treatment = {
     date: string;
     time: string;
     doctor: string;
+    description: string;
     status: 'pending' | 'completed' | 'canceled';
 };
 
 type Appointment = {
     id: string;
-    date: string;
+    meeting_date: string;
+    purpose: string;
     startTime: string;
     staff: string;
+    meeting_link: string;
+    location: string;
     status: 'pending' | 'completed' | 'canceled';
 };
 
@@ -152,6 +156,7 @@ export default function Profile() {
                                         <th className="py-2 px-4 border-b">Date</th>
                                         <th className="py-2 px-4 border-b">Time</th>
                                         <th className="py-2 px-4 border-b">Doctor</th>
+                                        <th className="py-2 px-4 border-b">Description</th>
                                         <th className="py-2 px-4 border-b">Status</th>
                                     </tr>
                                 </thead>
@@ -180,7 +185,7 @@ export default function Profile() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="py-2 px-4 text-center text-gray-500">
+                                            <td colSpan="5" className="py-2 px-4 text-center text-gray-500">
                                                 There are no treatments yet.
                                             </td>
                                         </tr>
@@ -209,8 +214,11 @@ export default function Profile() {
                                 <thead className="bg-[#1F2B6C] text-white">
                                     <tr>
                                         <th className="py-2 px-4 border-b">Date</th>
+                                        <th className="py-2 px-4 border-b">Purpose</th>
                                         <th className="py-2 px-4 border-b">Start Time</th>
                                         <th className="py-2 px-4 border-b">Staff</th>
+                                        <th className="py-2 px-4 border-b">Meeting's link</th>
+                                        <th className="py-2 px-4 border-b">Location</th>
                                         <th className="py-2 px-4 border-b">Status</th>
                                     </tr>
                                 </thead>
@@ -218,9 +226,12 @@ export default function Profile() {
                                     {appointments.length > 0 ? (
                                         appointments.map((appointment) => (
                                             <tr key={appointment.id}>
-                                                <td className="py-2 px-4 border-b">{appointment.date}</td>
+                                                <td className="py-2 px-4 border-b">{appointment.meeting_date}</td>
+                                                <td className="py-2 px-4 border-b">{appointment.purpose}</td>
                                                 <td className="py-2 px-4 border-b">{appointment.startTime}</td>
                                                 <td className="py-2 px-4 border-b">{appointment.staff}</td>
+                                                <td className="py-2 px-4 border-b">{appointment.meeting_link}</td>
+                                                <td className="py-2 px-4 border-b">{appointment.location}</td>
                                                 <td className="py-2 px-4 border-b">
                                                     {appointment.status === 'pending' ? (
                                                         <button
@@ -239,7 +250,7 @@ export default function Profile() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="py-2 px-4 text-center text-gray-500">
+                                            <td colSpan="7" className="py-2 px-4 text-center text-gray-500">
                                                 There are no appointments yet.
                                             </td>
                                         </tr>

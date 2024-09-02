@@ -5,7 +5,8 @@ export default function Treatment() {
     const [formData, setFormData] = useState({
         date: '',
         time: '',
-        doctor: ''
+        doctor: '',
+        description:''
     });
 
     const [timeConstraints, setTimeConstraints] = useState({
@@ -67,7 +68,8 @@ export default function Treatment() {
         setFormData({
             date: '',
             time: '',
-            doctor: ''
+            doctor: '',
+            description:''
         });
 
         setTimeout(() => {
@@ -113,7 +115,7 @@ export default function Treatment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">Select Doctor</label>
+                            <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">Doctor</label>
                             <div className='relative'>
                             <select
                                     id="doctor"
@@ -131,8 +133,20 @@ export default function Treatment() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
-                            </div>
-                            
+                            </div>  
+                        </div>
+
+                        <div className='flex flex-col space-y-2'>
+                            <label htmlFor="description" className="text-sm font-semibold text-[#1F2B6C]">Description</label>
+                            <input
+                                required
+                                type="description"
+                                id="tidescriptionme"
+                                placeholder="Add treatment's description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                            />
                         </div>
 
                         {successMessage && (

@@ -4,10 +4,14 @@ import "./appointment.scss";
 
 export default function Appointment() {
     const [formData, setFormData] = useState({
-        date: '',
+        meeting_date: '',
         startTime: '',
         endTime: '',
         staff: '',
+        purpose:'',
+        meeting_link:'',
+        location:'',
+        meeting_status:'',
         note: ''
     });
 
@@ -103,18 +107,25 @@ export default function Appointment() {
         console.log('Form submitted with data:', formData);
 
         setSuccessMessage(`
-            You have successfully made an appointment on <span style="color: red;">${formData.date || 'N/A'}</span><br/>
+            You have successfully made an appointment on <span style="color: red;">${formData.meeting_date || 'N/A'}</span><br/>
+            The purpose is about: <span style="color: red;">${formData.startTime || 'N/A'}</span> to <span style="color: red;">${formData.purpose || 'N/A'}</span><br/>
             Start from: <span style="color: red;">${formData.startTime || 'N/A'}</span> to <span style="color: red;">${formData.endTime || 'N/A'}</span><br/>
             With staff: <span style="color: red;">${formData.staff || 'N/A'}</span><br/>
+            At location: <span style="color: red;">${formData.location || 'N/A'}</span><br/>
+            In this meeting link:  <span style="color: red;">${formData.meeting_link || 'N/A'}</span><br/>
             Note: <span style="color: red;">${formData.note || 'N/A'}</span>
         `);
 
         // Reset form data
         setFormData({
-            date: '',
+            meeting_date: '',
             startTime: '',
             endTime: '',
             staff: '',
+            purpose:'',
+            meeting_link:'',
+            location:'',
+            meeting_status:'',
             note: ''
         });
 
@@ -140,7 +151,7 @@ export default function Appointment() {
                                 required
                                 type="date"
                                 id="date"
-                                value={formData.date}
+                                value={formData.meeting_date}
                                 onChange={handleChange}
                                 min={dateConstraints.minDate}
                                 max={dateConstraints.maxDate}
@@ -176,7 +187,19 @@ export default function Appointment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="staff" className="text-sm font-semibold text-[#1F2B6C]">Select Staff</label>
+                            <label htmlFor="purpose" className="text-sm font-semibold text-[#1F2B6C]">Purpose</label>
+                            <input
+                                type="text"
+                                id="purpose"
+                                value={formData.purpose}
+                                onChange={handleChange}
+                                placeholder="Add appoinment's purpose"
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                            />
+                        </div>
+
+                        <div className='flex flex-col space-y-2'>
+                            <label htmlFor="staff" className="text-sm font-semibold text-[#1F2B6C]">Staff</label>
                             <div className='relative'>
                                 <select
                                     id="staff"
@@ -196,9 +219,9 @@ export default function Appointment() {
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="note" className="text-sm font-semibold text-[#1F2B6C]">Add note</label>
+                            <label htmlFor="note" className="text-sm font-semibold text-[#1F2B6C]">Note</label>
                             <input
                                 type="text"
                                 id="note"
