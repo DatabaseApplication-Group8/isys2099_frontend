@@ -55,7 +55,7 @@ export default function AddPatient() {
 
             setTimeout(() => {
                 setSuccessMessage(''); 
-                window.location.href = "/auth/login";
+                window.location.href = "/admin/patient";
             }, 5000);
 
         } catch (error: any) {
