@@ -45,12 +45,32 @@ export default function Treatment() {
         });
     }, []);
 
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { id, value } = e.target;
-        setFormData({
-            ...formData,
-            [id]: value
-        });
+      const { id, value } = e.target;
+      setFormData({
+        ...formData,
+        [id]: value,
+      });
+
+      if (id === "date") {
+        const selectedDate = new Date(value);
+        const today = new Date();
+
+        if (selectedDate.toDateString() === today.toDateString()) {
+          const now = new Date();
+          const minTime = now.toTimeString().split(" ")[0].slice(0, 5);
+          setTimeConstraints((prevConstraints) => ({
+            ...prevConstraints,
+            minTime,
+          }));
+        } else {
+          setTimeConstraints((prevConstraints) => ({
+            ...prevConstraints,
+            minTime: "", // No minTime constraint for future dates
+          }));
+        }
+      }
     };
 
     const handleSubmit = (event: React.FormEvent) => {
