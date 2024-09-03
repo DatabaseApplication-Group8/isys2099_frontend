@@ -16,7 +16,7 @@ export default {
     staff: {
         create: "",
         readOne: "",
-        readAll: "",
+        readAll: "/staff",
         update: "",
         delete: ""
     },
