@@ -4,14 +4,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IStaff } from '@/types/user';
 import Link from 'next/link';
+import { useUserContext } from "@/app/context";
 
 export default function Staff() {
+    const {user} = useUserContext();
     const [error, setError] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [staffList, setStaffList] = useState<IStaff[]>([]);
     const [filteredStaff, setFilteredStaff] = useState<IStaff[]>([]);
-    const [searchId, setSearchId] = useState<string>('');
+    const [searchId, setSearchId] = useState<number>();
     const [departmentFilter, setDepartmentFilter] = useState<string>('');
     const [nameFilter, setNameFilter] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -20,7 +22,13 @@ export default function Staff() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.post('/api/staffs');
+                const token  = localStorage.getItem('accessToken')
+                const response = await axios.get('http://localhost:8080/staff',{
+                    headers : {
+                       Authorization : `Bearer ${token}` 
+                    }
+                });
+                console.log(response);
                 setStaffList(response.data);
                 setFilteredStaff(response.data);
             } catch (error) {
@@ -33,11 +41,13 @@ export default function Staff() {
         fetchData();
     }, []);
 
+
+
     useEffect(() => {
         let filteredList = staffList;
 
         if (searchId) {
-            filteredList = filteredList.filter(s => s.id === searchId);
+            filteredList = filteredList.filter(s => s.s_id === searchId);
         }
 
         if (departmentFilter) {
@@ -53,17 +63,18 @@ export default function Staff() {
         setFilteredStaff(filteredList);
     }, [searchId, departmentFilter, nameFilter, staffList]);
 
-    const handleDeleteStaff = (id: string) => {
-        setStaffList(staffList.filter(s => s.id !== id));
-        setFilteredStaff(filteredStaff.filter(s => s.id !== id));
+    const handleDeleteStaff = (id: number) => {
+        setStaffList(staffList.filter(s => s.s_id !== id));
+        setFilteredStaff(filteredStaff.filter(s => s.s_id !== id));
         setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
     };
 
-    const handleUpdateStaff = (id: string, updatedData: Partial<IStaff>) => {
-        setStaffList(staffList.map(s => (s.id === id ? { ...s, ...updatedData } : s)));
-        setFilteredStaff(filteredStaff.map(s => (s.id === id ? { ...s, ...updatedData } : s)));
+    const handleUpdateStaff = (id: number, updatedData: Partial<IStaff>) => {
+        setStaffList(staffList.map(s => (s.s_id === id ? { ...s, ...updatedData } : s)));
+        setFilteredStaff(filteredStaff.map(s => (s.s_id === id ? { ...s, ...updatedData } : s)));
         setSuccessMessage(`Staff with ID ${id} updated successfully.`);
     };
+
 
     return (
         <main className="staff bg-[#E6F0FF] min-h-screen pt-4">
@@ -74,7 +85,7 @@ export default function Staff() {
                         <input
                             type="text"
                             value={searchId}
-                            onChange={(e) => setSearchId(e.target.value)}
+                            onChange={(e) => setSearchId(parseInt(e.target.value))}
                             placeholder="Search staff by ID"
                             className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
                         />
@@ -131,20 +142,20 @@ export default function Staff() {
                             <tbody>
                                 {filteredStaff.length > 0 ? (
                                     filteredStaff.map((staff) => (
-                                        <tr key={staff.id}>
-                                            <td className="text-black py-2 px-4 border-b">{staff.id}</td>
-                                            <td className="text-black py-2 px-4 border-b">{staff.firstName} {staff.lastName}</td>
-                                            <td className="text-black py-2 px-4 border-b">{staff.job}</td>
-                                            <td className="text-black py-2 px-4 border-b">{staff.email}</td>
-                                            <td className="text-black py-2 px-4 border-b">{staff.department}</td>
-                                            <td className="text-black py-2 px-4 border-b">{staff.qualification}</td>
+                                        <tr key={staff.s_id}>
+                                            <td className="text-black py-2 px-4 border-b">{staff.s_id}</td>
+                                            <td className="text-black py-2 px-4 border-b">{staff.users.Fname} {staff.users.Lname}</td>
+                                            <td className="text-black py-2 px-4 border-b">{staff.jobs.job_id}</td>
+                                            <td className="text-black py-2 px-4 border-b">{staff.users.email}</td>
+                                            <td className="text-black py-2 px-4 border-b">{staff.departments.dept_name}</td>
+                                            <td className="text-black py-2 px-4 border-b">{staff.qualifications}</td>
                                             <td className="text-black py-2 px-4 border-b">{staff.salary}</td>
                                             <td className="text-black py-2 px-4 border-b">
                                                 <div className='flex flex-row'>
-                                                    <button onClick={() => handleUpdateStaff(staff.id, { department: "Updated Department" })} className="bg-blue-600 text-white py-2 px-4 rounded-md mt-2 mr-2">
+                                                    <button onClick={() => handleUpdateStaff(staff.s_id, { department: "Updated Department" })} className="bg-blue-600 text-white py-2 px-4 rounded-md mt-2 mr-2">
                                                         Edit
                                                     </button>
-                                                    <button onClick={() => handleDeleteStaff(staff.id)} className="bg-red-600 text-white py-2 px-4 rounded-md mt-2">
+                                                    <button onClick={() => handleDeleteStaff(staff.s_id)} className="bg-red-600 text-white py-2 px-4 rounded-md mt-2">
                                                         Delete
                                                     </button>
                                                 </div>
@@ -158,6 +169,7 @@ export default function Staff() {
                                         </td>
                                     </tr>
                                 )}
+                                
                             </tbody>
                         </table>
                     </div>

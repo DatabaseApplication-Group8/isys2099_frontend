@@ -16,6 +16,10 @@ export type IPatient = {
 }
 
 export type IStaff = {
+    users: IUsers;
+    s_id : number,
+    jobID : number,
+    jobs :  Job,
     username: string;
     firstName: string,
     mInit: string,
@@ -26,11 +30,35 @@ export type IStaff = {
     sex: string,
     password: string,
     staff: string,
-    department: string,
+    departments: Department,
     salary: number,
-    qualification: string,
+    qualifications: string,
 }
 
+export type Job = {
+    job_id : number,
+    job_title : string,
+    description: string
+}
+
+export type Department = {
+    dept_id : number,
+    dept_name : string,
+    description : string
+}
+export type IUsers = {
+    id: number;
+    role: number;
+    username: string;
+    pw: string;  // Note: 'pw' stands for password. Consider renaming to 'passwordHash' or similar for clarity
+    Fname: string;  // First name
+    Minit: string;  // Middle initial
+    Lname: string;  // Last name
+    phone: string;
+    email: string;
+    sex: string;  // Consider using an enum if the set of possible values is limited
+    birth_date: string;  // ISO string date
+}
 export type ILoginProps = {
     email: string,
     password: string
