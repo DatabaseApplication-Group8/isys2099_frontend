@@ -325,10 +325,12 @@ export default function Appointment() {
                 Make an Appointment
               </button>
             </div>
-
-            
           </form>
-          {error && <div className="col-span-2 text-red-500 text-sm text-center mt-5">{error}</div>}
+          {error && (
+            <div className="error-message mt-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
         </div>
       </main>
     </div>
