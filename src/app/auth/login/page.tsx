@@ -39,7 +39,7 @@ export default function Login() {
       localStorage.setItem("accessToken", response.data.access_token);
       console.log(response.data);
       if (response.data.access_token) {
-        window.location.href = "/dashboard";
+        window.location.href = "/profile";
       } else {
         setError(response.data?.message || "Invalid email or password.");
       }

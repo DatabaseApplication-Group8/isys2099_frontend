@@ -1,92 +1,66 @@
 "use client";
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-
+import { useUserContext } from "@/app/context";
 
 const Header: React.FC = () => {
+    const { user } = useUserContext();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-    
-    // Mock function to check user authentication status
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                // Replace with your API endpoint and logic
-                const response = await fetch('/api/check-auth');
-                const data = await response.json();
-                
-                // Check if user is authenticated
-                if (data.isAuthenticated) {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
-                }
-            } catch (error) {
-                console.error('Failed to check authentication status:', error);
-                setIsAuthenticated(false);
-            }
-        };
-
-        checkAuth();
-    }, []);
+        if (user.username && user.role) {
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
+        }
+    }, [user]);
 
     return (
-        <header className="header w-full h-16 bg-[#1F2B6C] text-white flex justify-between items-center px-8 shadow-lg">
+        <header className="header w-full h-16 bg-[#1F2B6C] text-white flex items-center px-6 md:px-8 shadow-lg">
             <div className="logo text-2xl font-bold">
                 <Link href="/">Group8</Link>
             </div>
 
-            {isAuthenticated ? (
-                <nav className="staff-patient-nav">
-                <ul className='flex space-x-8'>
-                    <li>
-                        <Link href="/" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Home</Link>
-                    </li>
-                    <li>
-                        <Link href="/appointment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Appointment</Link>
-                    </li>
-                    <li>
-                        <Link href="/treatment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Treatment</Link>
-                    </li>
-                </ul>
-            </nav>
-            ):(
-                <>
-                    <nav className="auth-nav">
-                        <ul className="flex space-x-6">
+            <nav className="flex flex-grow items-center space-x-6">
+                {isAuthenticated ? (
+                    <div className='flex w-full items-center'>
+                        <div className="flex-grow flex justify-center space-x-12">
+                            <Link href="/" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Home</Link>
+                            <Link href="/appointment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Appointment</Link>
+                            <Link href="/treatment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Treatment</Link>
+                        </div>
+                        <div className="flex justify-end items-center space-x-4">
+                            <Link href='/profile' className='flex items-center text-[#BFD2F8] hover:text-[#FCFEFE]'>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                                {user.username}
+                            </Link>
+                        </div>
+                    </div>
+                ) : (
+                    <div className='flex w-full items-center justify-end'>
+                        <div className="flex space-x-6">
                             <Link href='/auth/login'>
                                 <button
-                                    className="h-[45px] w-[123px] mr-2 flex border-solid border-[3px] border-[#C5DCFF] rounded-[50px] 
-                                            text-[#1F2B6C] bg-white items-center justify-center
-                                            hover:bg-gray-200 
-                                            focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="h-[45px] w-[123px] border border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     aria-label="Log In"
                                 >
                                     Log In
                                 </button>
                             </Link>
-
                             <Link href='/auth/register'>
                                 <button
-                                    className="h-[45px] w-[123px] mr-2 flex rounded-[50px] 
-                                            text-[#1F2B6C]  bg-[#BFD2F8] items-center justify-center
-                                            hover:bg-gray-200 
-                                            focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="h-[45px] w-[123px] rounded-full text-[#1F2B6C] bg-[#BFD2F8] flex items-center justify-center hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     aria-label="Register"
                                 >
                                     Register
                                 </button>
                             </Link>
-                        </ul>
-                    </nav>
-                    <nav className="hidden profile">
-                        <ul className="flex space-x-6">
-                            <Link href='/profile' className='text-[#BFD2F8] hover:text-[#FCFEFE]'>Profile</Link>
-                        </ul>
-                    </nav>
-                </>
-            )}
-
+                        </div>
+                    </div>
+                )}
+            </nav>
 
         </header>
     );

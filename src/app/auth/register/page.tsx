@@ -29,6 +29,8 @@ export default function Register() {
     const [loading, setLoading] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 
     const handleShowPassword = () => setShowPassword(!showPassword);
     const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -59,7 +61,14 @@ export default function Register() {
                 address: formData.address,
                 allergies: formData.allergies,
             });
-            window.location.href = "/auth/login";
+
+            setSuccessMessage('You have successfully registered an account!');
+
+            setTimeout(() => {
+                setSuccessMessage(''); 
+                window.location.href = "/auth/login";
+            }, 5000);
+
         } catch (error: any) {
             setError(error.response.data.message || "An error occurred. Please try again later.");
         } finally {
@@ -177,7 +186,6 @@ export default function Register() {
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="mInit" className="text-sm font-semibold text-[#1F2B6C]">Middle Name</label>
                             <input
-                                required
                                 type="text"
                                 id="mInit"
                                 value={formData.mInit}
@@ -214,7 +222,6 @@ export default function Register() {
                                     <option value="" disabled>Select your sex</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
-                                    <option value="other">Other</option>
                                 </select>
                                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -467,13 +474,20 @@ export default function Register() {
                             </div>
                         </div>
 
+                        {successMessage && (
+                            <div
+                                className="col-span-2 flex justify-center p-4 border border-green-500 rounded text-green-700 bg-green-100"
+                                dangerouslySetInnerHTML={{ __html: successMessage }}
+                            />
+                        )}
+
                         {error && <div className="col-span-2 text-red-500 text-sm text-center">{error}</div>}
 
                         <div className="col-span-2 flex justify-center">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="h-[45px] w-full mt-4 border border-[#C5DCFF] rounded-md
+                                className="h-[45px] w-full border border-[#C5DCFF] rounded-md
                                             bg-[#1F2B6C] text-white
                                             hover:bg-[#1D3F7F] hover:shadow-lg 
                                             focus:outline-none focus:ring-2 focus:ring-blue-500"
