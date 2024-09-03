@@ -1,11 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import { IStaff } from '@/types/user';
-
 
 export default function AddStaff() {
-    const [formData, setFormData] = useState<IStaff>({
+    const [formData, setFormData] = useState({
         username: "",
         firstName: "",
         mInit: "",
@@ -15,6 +13,7 @@ export default function AddStaff() {
         sex: "",
         email: "",
         password: "",
+        manager: '',
         department: "",
         salary: 0,
         qualification: ""
@@ -25,6 +24,21 @@ export default function AddStaff() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const handleShowPassword = () => setShowPassword(!showPassword);
+    const [managerList, setManagerList] = useState([]);
+
+    useEffect(() => {
+        const fetchStaff = async () => {
+            try {
+                const response = await fetch('/api/manager');
+                const data = await response.json();
+                setManagerList(data);
+            } catch (error) {
+                console.error('Error fetching staff:', error);
+            }
+        };
+
+        fetchStaff();
+    }, []);
 
     const handleAddStaff = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -49,10 +63,12 @@ export default function AddStaff() {
                 sex: formData.sex,
                 birth_date: formData.dob,
                 roles: 2,
+                manager: formData.manager,
                 department: formData.department,
                 salary: formData.salary,
                 qualification: formData.qualification
             });
+
 
             setSuccessMessage('You have successfully created new staff!');
 
@@ -126,11 +142,11 @@ export default function AddStaff() {
     return (
         <div className='min-h-screen flex justify-center'>
             <main className="flex flex-col flex-grow p-12 justify-center items-center">
-                <div className="container p-12 max-w-4xl rounded-lg bg-[#BFD2F8] bg-opacity-[50%] shadow-lg">
+                <div className="container p-12 max-w-3xl rounded-lg bg-[#BFD2F8] bg-opacity-[50%] shadow-lg">
                     <div className="flex justify-center mb-8">
                         <h1 className="text-3xl font-bold text-[#1F2B6C]">Add New Staff</h1>
                     </div>
-                    <form onSubmit={handleAddStaff} className="container-content grid grid-cols-4 gap-3">
+                    <form onSubmit={handleAddStaff} className="container-content grid grid-cols-2 gap-6"> {/* Updated grid layout */}
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="username" className="text-sm font-semibold text-[#1F2B6C]">Username</label>
                             <input
@@ -142,7 +158,6 @@ export default function AddStaff() {
                                 placeholder="Enter username"
                                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             /></div>
-
 
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="firstName" className="text-sm font-semibold text-[#1F2B6C]">First Name</label>
@@ -196,7 +211,7 @@ export default function AddStaff() {
                                     <option value="M">Male</option>
                                     <option value="F">Female</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
+                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
@@ -217,7 +232,7 @@ export default function AddStaff() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="phone" className="text-sm font-semibold text-[#1F2B6C]">Phone Number</label>
+                            <label htmlFor="phone" className="text-sm font-semibold text-[#1F2B6C]">Phone</label>
                             <input
                                 required
                                 type="text"
@@ -243,6 +258,24 @@ export default function AddStaff() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
+                            <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+                            <select
+                                required
+                                id="manager"
+                                value={formData.manager}
+                                onChange={handleChange}
+                                className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                            >
+                                <option value="" disabled>Select a manager</option>
+                                {managerList.map((manager) => (
+                                    <option key={manager.id} value={manager.id}>
+                                        {manager.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className='flex flex-col space-y-2'>
                             <label htmlFor="department" className="text-sm font-semibold text-[#1F2B6C]">Department</label>
                             <input
                                 required
@@ -251,19 +284,6 @@ export default function AddStaff() {
                                 value={formData.department}
                                 onChange={handleChange}
                                 placeholder="Enter department"
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                            />
-                        </div>
-
-                        <div className='flex flex-col space-y-2'>
-                            <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
-                            <input
-                                required
-                                type="text"
-                                id="qualification"
-                                value={formData.qualification}
-                                onChange={handleChange}
-                                placeholder="Enter qualification"
                                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                             />
                         </div>
@@ -281,11 +301,22 @@ export default function AddStaff() {
                             />
                         </div>
 
-                        <div className="flex flex-col space-y-2">
-                            <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">
-                                Password
-                            </label>
-                            <div className="relative">
+                        <div className='flex flex-col space-y-2'>
+                            <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
+                            <input
+                                required
+                                type="text"
+                                id="qualification"
+                                value={formData.qualification}
+                                onChange={handleChange}
+                                placeholder="Enter qualification"
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                            />
+                        </div>
+
+                        <div className='flex flex-col space-y-2 col-span-2'>
+                            <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">Password</label>
+                            <div className='relative'>
                                 <input
                                     required
                                     type={showPassword ? "text" : "password"}
@@ -293,11 +324,11 @@ export default function AddStaff() {
                                     value={formData.password}
                                     onChange={handleChange}
                                     placeholder="Enter password"
-                                    className="w-full p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] pr-12" // Added pr-12 to provide space for the icon
+                                    className="w-full p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                                 />
                                 <div
                                     onClick={handleShowPassword}
-                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                                    className="absolute inset-y-0 right-[1rem] flex items-center cursor-pointer"
                                 >
                                     {showPassword ? (
                                         <svg width="20" height="20" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -337,21 +368,23 @@ export default function AddStaff() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-span-4 flex items-center justify-center">
-                            <button
-                                type="submit"
-                                className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md w-full">
-                                {loading ? "Submitting..." : "Add New Staff"}
-                            </button>
-                        </div>
-                    </form>
 
-                    {error && <p className="text-red-600 mt-4">{error}</p>}
-                    {successMessage && <p className="text-green-600 mt-4">{successMessage}</p>}
+                        <div className='col-span-2 flex justify-between items-center mt-4'>
+                        <button
+                            type="submit"
+                            className="w-full bg-[#1F2B6C] hover:bg-[#1F2B6C] text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            disabled={loading}
+                        >
+                            {loading ? "Adding Staff..." : "Add Staff"}
+                        </button>
+                        {error && <div className="col-span-2 text-red-500 text-sm font-semibold">{error}</div>}
+                        {successMessage && <div className="col-span-2 text-green-500 text-sm font-semibold">{successMessage}</div>}
+                    </div>
+
+                    </form>
+                    
                 </div>
             </main>
         </div>
-
     );
-
-};
+}

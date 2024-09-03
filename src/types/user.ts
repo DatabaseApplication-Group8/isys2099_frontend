@@ -25,6 +25,7 @@ export type IStaff = {
     dob: string,
     sex: string,
     password: string,
+    staff: string,
     department: string,
     salary: number,
     qualification: string,

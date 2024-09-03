@@ -2,13 +2,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import {
-    mockPatientTreatmentHistory,
-    mockAllPatientTreatments,
-    mockJobChangeHistory,
-    mockDoctorWork
-} from './mockData';
-
 // Define types for the reports
 type TreatmentHistory = {
     id: string;
@@ -35,7 +28,7 @@ type DoctorWork = {
 const Button = ({ onClick, children }: { onClick: () => void; children: React.ReactNode }) => (
     <button
         onClick={onClick}
-        className="bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors "
+        className="bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
     >
         {children}
     </button>
@@ -80,7 +73,6 @@ export default function AdminDashboard() {
         doctorWork: false,
         jobChangeHistory: false
     });
-    const useMockData = true;
 
     // Validate date range
     const validateDateRange = () => {
@@ -105,23 +97,8 @@ export default function AdminDashboard() {
 
     const fetchData = async (url: string, params: object, setter: React.Dispatch<React.SetStateAction<any[]>>, dateKey: string, key: keyof typeof dataFetched) => {
         try {
-            let data = [];
-            if (useMockData) {
-                if (url === '/api/patient-treatment-history') {
-                    data = mockPatientTreatmentHistory;
-                } else if (url === '/api/all-patient-treatments') {
-                    data = mockAllPatientTreatments;
-                } else if (url === '/api/doctor-work') {
-                    data = mockDoctorWork;
-                } else if (url === '/api/job-change-history') {
-                    data = mockJobChangeHistory;
-                }
-            } else {
-                const response = await axios.get(url, { params });
-                data = response.data;
-            }
-
-            const filteredData = filterDataByDateRange(data, dateKey);
+            const response = await axios.get(url, { params });
+            const filteredData = filterDataByDateRange(response.data, dateKey);
             setter(filteredData);
             setDataFetched(prev => ({ ...prev, [key]: true }));
             setErrorMessage(null);
@@ -150,29 +127,16 @@ export default function AdminDashboard() {
             setErrorMessage('Staff ID is required.');
             return;
         }
-    
+
         try {
-            let data = [];
-            if (useMockData) {
-                data = mockJobChangeHistory.filter(item => item.staffId === staffId);
-            } else {
-                const response = await axios.get('/api/job-change-history', { params: { staffId } });
-                data = response.data;
-            }
-    
-            if (data.length === 0) {
-                setErrorMessage('No job change history found for the given Staff ID.');
-            } else {
-                setErrorMessage(null);
-                setJobChangeHistory(data);
-            }
-    
+            const response = await axios.get('/api/job-change-history', { params: { staffId } });
+            setJobChangeHistory(response.data);
+            setErrorMessage(null);
             setDataFetched(prev => ({ ...prev, jobChangeHistory: true }));
         } catch (error) {
             setErrorMessage('Error fetching job change history.');
         }
     };
-    
 
     const getStatusClass = (status: string) => {
         switch (status) {
@@ -186,7 +150,7 @@ export default function AdminDashboard() {
     return (
         <main className="admin-dashboard bg-[#E6F0FF] min-h-screen pt-4">
             <div className="container mx-auto px-4">
-                <h1 className="text-3xl mb-6 font-bold text-gray-900">Report Generate?</h1>
+                <h1 className="text-3xl mb-6 font-bold text-gray-900">Report Generate</h1>
 
                 <div className="flex flex-row justify-between gap-2">
                     <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6">
@@ -222,9 +186,9 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col justify-between">
-                        <div className="flex flex-col ">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by Staff ID</h2>
-                        <input
+                        <div className="flex flex-col">
+                            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by Staff ID</h2>
+                            <input
                                 type="text"
                                 value={staffId}
                                 onChange={(e) => setStaffId(e.target.value)}
@@ -233,7 +197,6 @@ export default function AdminDashboard() {
                             />
                         </div>
 
-                        
                         <div className="w-full">
                             <Button onClick={handleViewJobChangeHistory}>View Job Change History</Button>
                         </div>
@@ -258,40 +221,59 @@ export default function AdminDashboard() {
                 )}
                 {dataFetched.doctorWork && doctorWork.length === 0 && startDate && endDate && (
                     <div className="text-gray-500 mb-6 text-center">
-                        No work records found for the selected date range.
+                        No doctor work records found for the selected date range.
                     </div>
                 )}
-                {/*
                 {dataFetched.jobChangeHistory && jobChangeHistory.length === 0 && staffId && (
                     <div className="text-gray-500 mb-6 text-center">
+                        No job change history found for the given staff ID.
                     </div>
                 )}
-                */}
-                
 
                 {patientTreatmentHistory.length > 0 && (
-                    <Table
-                        columns={['ID', 'Date', 'Time', 'Doctor', 'Status']}
-                        data={patientTreatmentHistory}
-                    />
+                    <div className="text-black">
+                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Patient Treatment History</h2>
+                        <Table
+                            columns={['ID', 'Date', 'Time', 'Doctor', 'Status']}
+                            data={patientTreatmentHistory.map((treatment) => ({
+                                ...treatment,
+                                status: <span className={getStatusClass(treatment.status)}>{treatment.status}</span>,
+                            }))}
+                        />
+                    </div>
                 )}
+
                 {allPatientTreatments.length > 0 && (
-                    <Table
-                        columns={['ID', 'Date', 'Time', 'Patient', 'Treatment']}
-                        data={allPatientTreatments}
-                    />
+                    <div className="text-black">
+                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">All Patient Treatments</h2>
+                        <Table
+                            columns={['ID', 'Date', 'Time', 'Doctor', 'Status']}
+                            data={allPatientTreatments.map((treatment) => ({
+                                ...treatment,
+                                status: <span className={getStatusClass(treatment.status)}>{treatment.status}</span>,
+                            }))}
+                        />
+                    </div>
                 )}
+
                 {doctorWork.length > 0 && (
-                    <Table
-                        columns={['Doctor ID', 'Patient ID', 'Treatment Date', 'Treatment ID']}
-                        data={doctorWork}
-                    />
+                    <div className="text-black">
+                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Doctor Work Report</h2>
+                        <Table
+                            columns={['Doctor ID', 'Patient ID', 'Treatment Date', 'Treatment ID']}
+                            data={doctorWork}
+                        />
+                    </div>
                 )}
+
                 {jobChangeHistory.length > 0 && (
-                    <Table
-                        columns={['Staff ID', 'Change Date', 'Previous Role', 'New Role']}
-                        data={jobChangeHistory}
-                    />
+                    <div className="text-black">
+                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Job Change History</h2>
+                        <Table
+                            columns={['Staff ID', 'Change Date', 'Previous Role', 'New Role']}
+                            data={jobChangeHistory}
+                        />
+                    </div>
                 )}
             </div>
         </main>

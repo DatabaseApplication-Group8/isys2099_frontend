@@ -25,59 +25,35 @@ type Patient = {
 };
 
 export default function Patient() {
-    // Define the mock patient data directly
-    const mockPatientData: Patient[] = [
-        {
-            id: "1",
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            phone: "123-456-7890",
-            dob: "1990-01-01",
-            address: "123 Main St, Anytown, USA",
-            allergies: "Peanuts",
-            password: "password123",
-            treatmentHistory: [
-                { id: "t1", date: "2023-07-20", time: "10:00 AM", doctor: "Dr. Smith", status: "pending" },
-                { id: "t2", date: "2023-08-15", time: "2:00 PM", doctor: "Dr. Johnson", status: "completed" },
-            ],
-        },
-        {
-            id: "2",
-            firstName: "Jane",
-            lastName: "Smith",
-            email: "jane.smith@example.com",
-            phone: "987-654-3210",
-            dob: "1985-05-10",
-            address: "456 Elm St, Othertown, USA",
-            allergies: "None",
-            password: "password456",
-            treatmentHistory: [
-                { id: "t3", date: "2023-06-10", time: "11:00 AM", doctor: "Dr. Davis", status: "completed" },
-                { id: "t4", date: "2023-08-05", time: "3:00 PM", doctor: "Dr. Clark", status: "canceled" },
-            ],
-        },
-    ];
-
-    // Define the state types
     const [patientList, setPatientList] = useState<Patient[]>([]);
     const [filteredPatient, setFilteredPatient] = useState<Patient | null>(null);
     const [searchId, setSearchId] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        // Simulate API call with mock data
-        setPatientList(mockPatientData);
-        setFilteredPatient(null); // Reset filteredPatient on new fetch
+        const fetchPatients = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get<Patient[]>('https://api.example.com/patients');
+                setPatientList(response.data);
+            } catch (error) {
+                console.error('Error fetching patient data:', error);
+                setErrorMessage('Failed to load patient data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPatients();
     }, []);
 
-    // Handle search by patient ID
     const handleSearch = () => {
         const patient = patientList.find(p => p.id === searchId);
         if (patient) {
             setFilteredPatient(patient);
-            setSuccessMessage(null);
+            setSuccessMessage('Patient found.');
             setErrorMessage(null);
         } else {
             setFilteredPatient(null);
@@ -104,7 +80,13 @@ export default function Patient() {
                             </tr>
                         </thead>
                         <tbody>
-                            {patientList.length === 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="7" className="py-4 px-4 text-center text-gray-500">
+                                        Loading patients...
+                                    </td>
+                                </tr>
+                            ) : patientList.length === 0 ? (
                                 <tr>
                                     <td colSpan="7" className="py-4 px-4 text-center text-gray-500">
                                         There are no patients yet!
@@ -113,13 +95,13 @@ export default function Patient() {
                             ) : (
                                 patientList.map((patient) => (
                                     <tr key={patient.id} className="hover:bg-gray-100 transition-colors">
-                                        <td className="py-2 px-4 border-b">{patient.id}</td>
-                                        <td className="py-2 px-4 border-b">{patient.firstName} {patient.lastName}</td>
-                                        <td className="py-2 px-4 border-b">{patient.email}</td>
-                                        <td className="py-2 px-4 border-b">{patient.phone}</td>
-                                        <td className="py-2 px-4 border-b">{patient.dob}</td>
-                                        <td className="py-2 px-4 border-b">{patient.address}</td>
-                                        <td className="py-2 px-4 border-b">{patient.allergies}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.id}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.firstName} {patient.lastName}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.email}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.phone}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.dob}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.address}</td>
+                                        <td className="text-black py-2 px-4 border-b">{patient.allergies}</td>
                                     </tr>
                                 ))
                             )}
@@ -207,7 +189,9 @@ export default function Patient() {
                                                 </tbody>
                                             </table>
                                         ) : (
-                                            <div className="text-gray-500 p-4">No treatment history available.</div>
+                                            <div className="py-4 px-4 text-center text-gray-500">
+                                                No treatment history available.
+                                            </div>
                                         )}
                                     </div>
                                 </div>
