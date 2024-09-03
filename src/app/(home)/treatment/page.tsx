@@ -127,30 +127,34 @@ export default function Treatment() {
         }
 
         try {
-            console.log("id", user.id);
             const accessToken = localStorage.getItem("accessToken");
             const response = await axios.post(
-                "http://localhost:8080/treatment/",
-                {
-                    date: formData.date,
-                    startTime: formData.startTime,
-                    endTime: formData.endTime,
-                    doctor: formData.doctor,
-                    description: formData.description,
+              "http://localhost:8080/treatment/",
+              {
+                treatment_date: formData.date,
+                start_time: new Date(`${formData.date}T${formData.startTime}:00Z`),
+                end_time: new Date(`${formData.date}T${formData.endTime}:00Z`),
+                doctor_id: parseInt(formData.doctor),
+                p_id: parseInt(user.id),
+                description: formData.description,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
+              }
             );
             console.log("Form submitted with data:", formData);
 
             setSuccessMessage(`
-                You have successfully made an appointment on <span style="color: red;">${formData.date || 'N/A'}</span><br/>
-                Start from: <span style="color: red;">${response.data.data.start_time.slice(11, 16) || "N/A"}</span> to <span style="color: red;">${response.data.data.end_time.slice(11, 16) || "N/A"}</span><br/>
-                With doctor: <span style="color: red;">${formData.doctor || 'N/A'}</span><br/>
-                Treatment's description: <span style="color: red;">${formData.description || 'N/A'}</span><br/>
+                You have successfully made an appointment on <span style="color: red;">${
+                  formData.date || "N/A"
+                }</span><br/>
+                Start from: <span style="color: red;">${
+                  response.data.data.start_time.slice(11, 16) || "N/A"
+                }</span> to <span style="color: red;">${response.data.data.end_time.slice(11, 16) || "N/A"}</span><br/>
+                With doctor: <span style="color: red;">${response.data.data.staff.users.Fname || "N/A"}</span><br/>
+                Treatment's description: <span style="color: red;">${formData.description || "N/A"}</span><br/>
             `);
             // Reset form data
             setFormData({
@@ -230,7 +234,7 @@ export default function Treatment() {
                                 >
                                     <option value="">Select Doctor</option>
                                     {doctorAvailableList.map(doctor => (
-                                        <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+                                        <option key={doctor.s_id} value={doctor.s_id}>{doctor.users.Fname}</option>
                                     ))}
                                 </select>
                                 <div className="absolute inset-y-0 right-[1rem] flex items-center pointer-events-none">
