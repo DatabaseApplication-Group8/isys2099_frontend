@@ -163,7 +163,7 @@ export default function Profile() {
             <button
               onClick={handleLogout}
               className="h-11 w-32 border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                            hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Log Out"
             >
               Log Out
@@ -181,7 +181,7 @@ export default function Profile() {
                   <button
                     className="h-11 px-3 border border-[#C5DCFF] rounded-md
                                             bg-[#1F2B6C] text-white
-                                            hover:bg-[#1D3F7F] hover:shadow-lg
+                                            hover:shadow-lg hover:scale-110 transition-all duration-300
                                             focus:outline-none focus:ring-2 focus:ring-blue-50"
                   >
                     Book Treatment
@@ -198,6 +198,7 @@ export default function Profile() {
                     <th className="py-2 px-4 border-b">End Time</th>
                     <th className="py-2 px-4 border-b">Doctor</th>
                     <th className="py-2 px-4 border-b">Description</th>
+                    <th className="py-2 px-4 border-b">Billing</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -213,7 +214,7 @@ export default function Profile() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="py-2 px-4 text-center text-gray-500">
+                      <td colSpan="7" className="py-2 px-4 text-center text-gray-500">
                         There are no treatments yet.
                       </td>
                     </tr>
@@ -231,7 +232,7 @@ export default function Profile() {
                   <button
                     className="h-11 px-3 border border-[#C5DCFF] rounded-md
                                             bg-[#1F2B6C] text-white
-                                            hover:bg-[#1D3F7F] hover:shadow-lg
+                                            hover:shadow-lg hover:scale-110 transition-all duration-300
                                             focus:outline-none focus:ring-2 focus:ring-blue-50"
                   >
                     Make an Appointment

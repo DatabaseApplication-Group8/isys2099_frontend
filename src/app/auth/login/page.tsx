@@ -5,6 +5,7 @@ import { login } from "@/api/auth.api";
 import { ILoginProps } from "@/types/user";
 import axios from "axios";
 import { useUserContext } from "@/app/context";
+import Link from 'next/link';
 
 export default function Login() {
   const { user } = useUserContext();
@@ -77,7 +78,7 @@ export default function Login() {
           <form onSubmit={handleLogin} className="flex flex-col space-y-4">
             <div className="flex flex-col space-y-3">
               <label htmlFor="email" className="text-sm font-semibold text-[#1F2B6C]">
-                Email:
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
@@ -92,7 +93,7 @@ export default function Login() {
 
             <div className="flex flex-col space-y-3">
               <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">
-                Password:
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -149,7 +150,7 @@ export default function Login() {
 
             {error && <div className="text-red-500 text-sm">{error}</div>}
 
-            <div className="flex justify-center items-center">
+            <div className="flex flex-col justify-center items-center">
               <button
                 type="submit"
                 disabled={loading}
@@ -158,8 +159,14 @@ export default function Login() {
                           hover:bg-[#1D3F7F] hover:shadow-lg 
                             focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {loading ? "Logging in..." : "Log In"}
+                {loading ? "Logging in..." : "Login"}
               </button>
+            </div>
+
+            <div className="flex justify-center items-center mt-3">
+              <Link href="/register" className="text-[#1F2B6C] hover:text-[#1D3F7F] text-sm">
+                Don’t have an account? <span className="text-red-500">Register</span>
+              </Link>
             </div>
           </form>
         </div>

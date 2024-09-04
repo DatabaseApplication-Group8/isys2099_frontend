@@ -222,7 +222,7 @@ export default function AddStaff() {
                 htmlFor="username"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Username
+                Username <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -239,7 +239,7 @@ export default function AddStaff() {
                 htmlFor="firstName"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                First Name
+                First Name <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -272,7 +272,7 @@ export default function AddStaff() {
                 htmlFor="lastName"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Last Name
+                Last Name <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -289,7 +289,7 @@ export default function AddStaff() {
                 htmlFor="sex"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Sex
+                Sex <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <select
@@ -297,7 +297,7 @@ export default function AddStaff() {
                   id="sex"
                   value={formData.sex}
                   onChange={handleChange}
-                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
                   <option value="" disabled>
                     Select sex
@@ -328,7 +328,7 @@ export default function AddStaff() {
                 htmlFor="dob"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Date of Birth
+                Date of Birth <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -345,7 +345,7 @@ export default function AddStaff() {
                 htmlFor="phone"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Phone
+                Phone <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -359,13 +359,15 @@ export default function AddStaff() {
             </div>
 
             <div className='flex flex-col space-y-2'>
-              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">
+                Manager
+              </label>
               <div className='relative'>
                 <select
                   id="manager"
                   value={formData.manager}
                   onChange={handleChange}
-                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
                   <option value="" disabled>Select a manager</option>
                   {managerList.map((manager) => (
@@ -387,14 +389,15 @@ export default function AddStaff() {
                 htmlFor="job"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Job
+                Job <span className="text-red-500">*</span>
               </label>
               <div className='relative'>
                 <select
+                  required
                   id="job"
                   value={formData.job}
                   onChange={handleChange}
-                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
                   <option value="" disabled>Select a job</option>
                   {jobList.map((job) => (
@@ -416,14 +419,15 @@ export default function AddStaff() {
                 htmlFor="department"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Department
+                Department <span className="text-red-500">*</span>
               </label>
               <div className='relative'>
                 <select
+                  required
                   id="department"
                   value={formData.department}
                   onChange={handleChange}
-                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
                   <option value="" disabled>Select a department</option>
                   {departmentList.map((department) => (
@@ -445,7 +449,7 @@ export default function AddStaff() {
                 htmlFor="salary"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Salary
+                Salary <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -479,7 +483,7 @@ export default function AddStaff() {
                 htmlFor="email"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Email
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -497,7 +501,7 @@ export default function AddStaff() {
                 htmlFor="password"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input

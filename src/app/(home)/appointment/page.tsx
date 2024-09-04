@@ -202,7 +202,7 @@ export default function Appointment() {
           <form className="container-content grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
             <div className="flex flex-col space-y-2">
               <label htmlFor="date" className="text-sm font-semibold text-[#1F2B6C]">
-                Choose a date
+                Choose a date <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -218,7 +218,7 @@ export default function Appointment() {
 
             <div className="flex flex-col space-y-2">
               <label htmlFor="startTime" className="text-sm font-semibold text-[#1F2B6C]">
-                Start time
+                Start time <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -233,7 +233,7 @@ export default function Appointment() {
 
             <div className="flex flex-col space-y-2">
               <label htmlFor="endTime" className="text-sm font-semibold text-[#1F2B6C]">
-                End time
+                End time <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -249,7 +249,7 @@ export default function Appointment() {
 
             <div className="flex flex-col space-y-2">
               <label htmlFor="purpose" className="text-sm font-semibold text-[#1F2B6C]">
-                Purpose
+                Purpose <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -263,7 +263,7 @@ export default function Appointment() {
 
             <div className="flex flex-col space-y-2">
               <label htmlFor="staff" className="text-sm font-semibold text-[#1F2B6C]">
-                Staff
+                Staff <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <select
@@ -293,6 +293,7 @@ export default function Appointment() {
               </div>
             </div>
 
+            {/*
             <div className="flex flex-col space-y-2">
               <label htmlFor="note" className="text-sm font-semibold text-[#1F2B6C]">
                 Note
@@ -306,6 +307,7 @@ export default function Appointment() {
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
             </div>
+            */}
 
             {successMessage && (
               <div

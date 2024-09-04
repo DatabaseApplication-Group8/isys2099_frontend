@@ -155,16 +155,16 @@ export default function Profile() {
           <div className="flex justify-end flex-row mt-4 space-x-4">
             <button
               onClick={handleUpdateClick}
-              className="h-11 w-32 border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                            hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="h-11 w-[135px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
+                            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Update Profile"
             >
               Update Profile
             </button>
             <button
               onClick={handleLogout}
-              className="h-11 w-32 border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                            hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="h-11 w-[130px] border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
+                            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Log Out"
             >
               Log Out
@@ -177,7 +177,7 @@ export default function Profile() {
           <div className="lg:w-2/3 mt-1 ">
             <h2 className="text-3xl font-semibold flex flex-col space-y-2 text-gray-900">Update Staff Profile</h2>
             <div className="mt-4 bg-[#BFD2F8] p-6 rounded-lg shadow-lg">
-              <form className="container-content grid grid-cols-3 gap-3" onSubmit={handleFormSubmit}>
+              <form className="container-content grid grid-cols-2 gap-3" onSubmit={handleFormSubmit}>
                 <div className="flex flex-col space-y-2">
                   <label htmlFor="lastName" className="text-sm font-semibold text-[#1F2B6C]">Last Name</label>
                   <input
@@ -249,16 +249,6 @@ export default function Profile() {
                   />
                 </div>
                 <div className="flex flex-col space-y-2">
-                  <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
-                  <input
-                    type="text"
-                    id="job"
-                    name="job"
-                    defaultValue={staff.job_title}
-                    className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-                  />
-                </div>
-                <div className="flex flex-col space-y-2">
                   <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
                   <input
                     type="text"
@@ -271,8 +261,8 @@ export default function Profile() {
                 <div className="flex justify-end flex-row mt-4 col-span-2 space-x-4">
                   <button
                     type="submit"
-                    className="h-11 w-32 border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                                  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="h-11 w-[135px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
+                                  hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     aria-label="Save Changes"
                   >
                     Save Changes
