@@ -58,6 +58,7 @@ export default function AddStaff() {
             },
           });
         const dataManagers = await responseAvailableManagers.data;
+        const dataManagersID = dataManagers.s_id;
         setManagerList(dataManagers);
        
         console.log("oke nhna data managers", dataManagers); // Log or process the fetched manager data
@@ -125,7 +126,7 @@ export default function AddStaff() {
       );
 
       // Fetch department ID
-
+      console.log("oke nhna", formData);
       const response = await axios.post(
         "http://localhost:8080/users",
         {
@@ -139,8 +140,8 @@ export default function AddStaff() {
           sex: formData.sex,
           birth_date: birth_date,
           roles: 2,
-          job: formData.job,
-          manager: formData.manager,
+          job_id: formData.job,
+          manager_id: formData.manager,
           dept_id: formData.department,
           salary: formData.salary,
           qualifications: formData.qualification,
