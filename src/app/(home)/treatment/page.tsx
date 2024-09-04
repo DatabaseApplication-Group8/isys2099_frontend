@@ -202,7 +202,9 @@ export default function Treatment() {
 
                     <form className="container-content grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="date" className="text-sm font-semibold text-[#1F2B6C]">Choose a date</label>
+                            <label htmlFor="date" className="text-sm font-semibold text-[#1F2B6C]">
+                                Choose a date <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="date"
@@ -216,7 +218,9 @@ export default function Treatment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="startTime" className="text-sm font-semibold text-[#1F2B6C]">Choose a time</label>
+                            <label htmlFor="startTime" className="text-sm font-semibold text-[#1F2B6C]">
+                                Start Time <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="time"
@@ -229,7 +233,9 @@ export default function Treatment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="endTime" className="text-sm font-semibold text-[#1F2B6C]">End Time</label>
+                            <label htmlFor="endTime" className="text-sm font-semibold text-[#1F2B6C]">
+                                End Time <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="time"
@@ -243,7 +249,9 @@ export default function Treatment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">Doctor</label>
+                            <label htmlFor="doctor" className="text-sm font-semibold text-[#1F2B6C]">
+                                Doctor <span className="text-red-500">*</span>
+                            </label>
                             <div className='relative'>
                                 <select
                                     id="doctor"
@@ -265,7 +273,9 @@ export default function Treatment() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="description" className="text-sm font-semibold text-[#1F2B6C]">Description</label>
+                            <label htmlFor="description" className="text-sm font-semibold text-[#1F2B6C]">
+                                Description <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 id="description"
                                 value={formData.description}

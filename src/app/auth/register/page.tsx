@@ -157,7 +157,9 @@ export default function Register() {
                     </div>
                     <form onSubmit={handleSubmit} className="container-content grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="username" className="text-sm font-semibold text-[#1F2B6C]">Username</label>
+                            <label htmlFor="username" className="text-sm font-semibold text-[#1F2B6C]">
+                                Username <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="text"
@@ -170,7 +172,9 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="firstName" className="text-sm font-semibold text-[#1F2B6C]">First Name</label>
+                            <label htmlFor="firstName" className="text-sm font-semibold text-[#1F2B6C]">
+                                First Name <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="text"
@@ -195,7 +199,9 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="lastName" className="text-sm font-semibold text-[#1F2B6C]">Last Name</label>
+                            <label htmlFor="lastName" className="text-sm font-semibold text-[#1F2B6C]">
+                                Last Name <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="text"
@@ -208,7 +214,9 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="sex" className="text-sm font-semibold text-[#1F2B6C]">Sex</label>
+                            <label htmlFor="sex" className="text-sm font-semibold text-[#1F2B6C]">
+                                Sex <span className="text-red-500">*</span>
+                            </label>
                             <div className='relative'>
                                 <select
                                     required
@@ -233,7 +241,7 @@ export default function Register() {
 
                         <div className="flex flex-col space-y-2">
                             <label htmlFor="day" className="text-sm font-semibold text-[#1F2B6C]">
-                                Date of Birth
+                                Date of Birth <span className="text-red-500">*</span>
                             </label>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className='relative'>
@@ -256,7 +264,6 @@ export default function Register() {
                                         </svg>
                                     </div>
                                 </div>
-
 
                                 <div className='relative'>
                                     <select
@@ -307,7 +314,9 @@ export default function Register() {
 
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="email" className="text-sm font-semibold text-[#1F2B6C]">Email</label>
+                            <label htmlFor="email" className="text-sm font-semibold text-[#1F2B6C]">
+                                Email <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="email"
@@ -320,7 +329,9 @@ export default function Register() {
                         </div>
 
                         <div className='flex flex-col space-y-2'>
-                            <label htmlFor="phone" className="text-sm font-semibold text-[#1F2B6C]">Phone</label>
+                            <label htmlFor="phone" className="text-sm font-semibold text-[#1F2B6C]">
+                                Phone <span className="text-red-500">*</span>
+                            </label>
                             <input
                                 required
                                 type="text"
@@ -349,7 +360,6 @@ export default function Register() {
                         <div className='flex flex-col space-y-2'>
                             <label htmlFor="allergies" className="text-sm font-semibold text-[#1F2B6C]">Allergies</label>
                             <input
-
                                 type="text"
                                 id="allergies"
                                 value={formData.allergies}
@@ -361,7 +371,7 @@ export default function Register() {
 
                         <div className="flex flex-col space-y-2 relative">
                             <label htmlFor="password" className="text-sm font-semibold text-[#1F2B6C]">
-                                Password
+                                Password <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <input
@@ -418,7 +428,7 @@ export default function Register() {
 
                         <div className="flex flex-col space-y-2 relative">
                             <label htmlFor="passwordConfirm" className="text-sm font-semibold text-[#1F2B6C]">
-                                Confirm Password
+                                Password confirmation <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <input

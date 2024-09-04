@@ -198,6 +198,8 @@ export default function Profile() {
                     <th className="py-2 px-4 border-b">End Time</th>
                     <th className="py-2 px-4 border-b">Doctor</th>
                     <th className="py-2 px-4 border-b">Description</th>
+                    <th className="py-2 px-4 border-b">Status</th>
+                    <th className="py-2 px-4 border-b">Billing</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -213,7 +215,7 @@ export default function Profile() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="py-2 px-4 text-center text-gray-500">
+                      <td colSpan="7" className="py-2 px-4 text-center text-gray-500">
                         There are no treatments yet.
                       </td>
                     </tr>

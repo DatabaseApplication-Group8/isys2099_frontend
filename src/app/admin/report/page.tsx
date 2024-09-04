@@ -166,7 +166,7 @@ export default function AdminDashboard() {
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="px-4 py-2 border rounded-lg flex-1"
+                                className="px-4 py-2 border rounded-lg flex-1 text-black"
                                 placeholder="Start Date"
                             />
                             <input
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
                                 type="date"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                className="px-4 py-2 border rounded-lg flex-1"
+                                className="px-4 py-2 border rounded-lg flex-1 text-black"
                                 placeholder="End Date"
                             />
                         </div>
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                                 type="text"
                                 value={staffId}
                                 onChange={(e) => setStaffId(e.target.value)}
-                                className="px-4 py-2 border rounded-lg flex-1"
+                                className="px-4 py-2 border rounded-lg flex-1 text-black"
                                 placeholder="Staff ID"
                             />
                         </div>

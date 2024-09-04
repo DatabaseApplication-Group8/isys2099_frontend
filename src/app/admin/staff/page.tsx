@@ -16,22 +16,22 @@ export default function Staff() {
     const [searchId, setSearchId] = useState<number>();
     const [departmentFilter, setDepartmentFilter] = useState<string>('');
     const [nameFilter, setNameFilter] = useState<string>('');
+    const [nameSortOrder, setNameSortOrder] = useState<'ASC' | 'DESC'>('ASC');  // New state for sorting order
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const token  = localStorage.getItem('accessToken')
-                const response = await axios.get('http://localhost:8080/staff',{
-                    headers : {
-                       Authorization : `Bearer ${token}` 
+                const token = localStorage.getItem('accessToken');
+                const response = await axios.get('http://localhost:8080/staff', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 console.log(response);
                 setStaffList(response.data);
                 setFilteredStaff(response.data);
-                // success message
                 setSuccessMessage('Staff data loaded successfully.');
                 setTimeout(() => {
                     setSuccessMessage('');
@@ -45,8 +45,6 @@ export default function Staff() {
         };
         fetchData();
     }, []);
-
-
 
     useEffect(() => {
         let filteredList = staffList;
@@ -65,8 +63,15 @@ export default function Staff() {
             );
         }
 
+        // Apply sorting based on nameSortOrder
+        if (nameSortOrder === 'ASC') {
+            filteredList = filteredList.sort((a, b) => a.users.Lname.localeCompare(b.users.Lname));
+        } else if (nameSortOrder === 'DESC') {
+            filteredList = filteredList.sort((a, b) => b.users.Lname.localeCompare(a.users.Lname));
+        }
+
         setFilteredStaff(filteredList);
-    }, [searchId, departmentFilter, nameFilter, staffList]);
+    }, [searchId, departmentFilter, nameFilter, nameSortOrder, staffList]);
 
     const handleDeleteStaff = (id: number) => {
         setStaffList(staffList.filter(s => s.s_id !== id));
@@ -104,6 +109,14 @@ export default function Staff() {
                                 placeholder="Filter by name"
                                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
                             />
+                            <select
+                                value={nameSortOrder}
+                                onChange={(e) => setNameSortOrder(e.target.value as 'ASC' | 'DESC')}
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
+                            >
+                                <option value="ASC">Sort by Name (ASC)</option>
+                                <option value="DESC">Sort by Name (DESC)</option>
+                            </select>
                         </div>
                         <div className="filter-by-dept">
                             <input
@@ -173,9 +186,14 @@ export default function Staff() {
                                         </td>
                                     </tr>
                                 )}
-                                
                             </tbody>
                         </table>
+                    </div>
+                )}
+                {error && <p className="text-red-600">{error}</p>}
+                {successMessage && (
+                    <div className="fixed top-0 left-0 w-full p-4 bg-green-100 text-green-900 text-center">
+                        {successMessage}
                     </div>
                 )}
             </div>
