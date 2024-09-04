@@ -14,6 +14,7 @@ export default function AddStaff() {
     sex: "",
     email: "",
     password: "",
+    job: "",
     manager: "",
     department: "",
     salary: 0,
@@ -26,20 +27,38 @@ export default function AddStaff() {
   const [showPassword, setShowPassword] = useState(false);
   const handleShowPassword = () => setShowPassword(!showPassword);
   const [managerList, setManagerList] = useState([]);
+  const [jobList, setJobList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
+  const [today, setToday] = useState<string>("");
 
   useEffect(() => {
+    const todayDate = new Date().toISOString().split("T")[0];
+    setToday(todayDate);
+
     const fetchStaff = async () => {
       try {
-        const response = await fetch("/api/manager");
-        const data = await response.json();
-        setManagerList(data);
+        // Fetch managers
+        const responseManagers = await fetch("/api/manager");
+        const dataManagers = await responseManagers.json();
+        setManagerList(dataManagers);
+
+        // Fetch jobs
+        const responseJobs = await fetch("/api/jobs"); // Update this URL with the actual endpoint
+        const dataJobs = await responseJobs.json();
+        setJobList(dataJobs);
+
+        // Fetch departments
+        const responseDepartments = await fetch("/api/departments"); // Update this URL with the actual endpoint
+        const dataDepartments = await responseDepartments.json();
+        setDepartmentList(dataDepartments);
       } catch (error) {
-        console.error("Error fetching staff:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchStaff();
   }, []);
+
 
   const handleAddStaff = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -95,6 +114,7 @@ export default function AddStaff() {
           sex: formData.sex,
           birth_date: birth_date,
           roles: 2,
+          job: formData.job,
           manager: formData.manager,
           dept_id: department_id,
           salary: formData.salary,
@@ -171,6 +191,10 @@ export default function AddStaff() {
       errors = [...errors, ...passwordValidationErrors];
     }
 
+    if (formData.salary < 0) {
+      errors.push("Salary must be greater than or equal to 0.");
+    }
+
     if (errors.length > 0) {
       setError(errors.join(" "));
       return false;
@@ -182,14 +206,14 @@ export default function AddStaff() {
 
   return (
     <div className="min-h-screen flex justify-center">
-      <main className="flex flex-col flex-grow p-12 justify-center items-center">
+      <main className="flex flex-col flex-grow p-3 justify-center items-center">
         <div className="container p-12 max-w-3xl rounded-lg bg-[#BFD2F8] bg-opacity-[50%] shadow-lg">
           <div className="flex justify-center mb-8">
             <h1 className="text-3xl font-bold text-[#1F2B6C]">Add New Staff</h1>
           </div>
           <form
             onSubmit={handleAddStaff}
-            className="container-content grid grid-cols-2 gap-6"
+            className="container-content grid grid-cols-2 gap-3"
           >
             {" "}
             {/* Updated grid layout */}
@@ -310,6 +334,7 @@ export default function AddStaff() {
                 required
                 type="date"
                 id="dob"
+                max={today}
                 value={formData.dob}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -332,41 +357,60 @@ export default function AddStaff() {
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
             </div>
+
+            <div className='flex flex-col space-y-2'>
+              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+              <div className='relative'>
+                <select
+                  id="manager"
+                  value={formData.manager}
+                  onChange={handleChange}
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                >
+                  <option value="" disabled>Select a manager</option>
+                  {managerList.map((manager) => (
+                    <option key={manager.id} value={manager.id}>
+                      {manager.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-col space-y-2">
               <label
-                htmlFor="email"
+                htmlFor="job"
                 className="text-sm font-semibold text-[#1F2B6C]"
               >
-                Email
+                Job
               </label>
-              <input
-                required
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter email"
-                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              />
+              <div className='relative'>
+                <select
+                  id="job"
+                  value={formData.job}
+                  onChange={handleChange}
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                >
+                  <option value="" disabled>Select a job</option>
+                  {jobList.map((job) => (
+                    <option key={job.id} value={job.id}>
+                      {job.title}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
-            {/*
-             <div className='flex flex-col space-y-2'>
-              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
-              <select
-                id="manager"
-                value={formData.manager}
-                onChange={handleChange}
-                className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
-              >
-                <option value="" disabled>Select a manager</option>
-                {managerList.map((manager) => (
-                  <option key={manager.id} value={manager.id}>
-                    {manager.name}
-                  </option>
-                ))}
-              </select>
-            </div>*/}
-           
+
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="department"
@@ -374,16 +418,28 @@ export default function AddStaff() {
               >
                 Department
               </label>
-              <input
-                required
-                type="text"
-                id="department"
-                value={formData.department}
-                onChange={handleChange}
-                placeholder="Enter department"
-                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              />
+              <div className='relative'>
+                <select
+                  id="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+                >
+                  <option value="" disabled>Select a department</option>
+                  {departmentList.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none"> {/* Adjusted positioning */}
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
+
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="salary"
@@ -417,7 +473,26 @@ export default function AddStaff() {
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
             </div>
-            <div className="flex flex-col space-y-2 col-span-2">
+
+            <div className="flex flex-col space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-semibold text-[#1F2B6C]"
+              >
+                Email
+              </label>
+              <input
+                required
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter email"
+                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+              />
+            </div>
+
+            <div className="flex flex-col space-y-2">
               <label
                 htmlFor="password"
                 className="text-sm font-semibold text-[#1F2B6C]"
@@ -489,16 +564,16 @@ export default function AddStaff() {
               </div>
             </div>
             {error && (
-                <div className="col-span-2 text-red-500 text-sm font-semibold">
-                  {error}
-                </div>
-              )}
-              {successMessage && (
-                <div className="col-span-2 text-green-500 text-sm font-semibold">
-                  {successMessage}
-                </div>
-              )}
-            <div className="col-span-2 flex justify-between items-center">
+              <div className="col-span-2 text-red-500 text-sm font-semibold">
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div className="col-span-2 text-green-500 text-sm font-semibold">
+                {successMessage}
+              </div>
+            )}
+            <div className="col-span-2 flex justify-between items-center mt-2">
               <button
                 type="submit"
                 className="w-full bg-[#1F2B6C] hover:bg-[#1F2B6C] text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

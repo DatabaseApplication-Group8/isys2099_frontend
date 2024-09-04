@@ -129,8 +129,8 @@ export default function Staff() {
                         <span className="text-gray-700">Loading staff...</span>
                     </div>
                 ) : (
-                    <div className='staff-database-container bg-white rounded-lg shadow-lg overflow-y-auto'>
-                        <table className="w-full text-left h-[450px]">
+                    <div className='staff-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto'>
+                        <table className="w-full text-left">
                             <thead className="bg-[#1F2B6C] text-white">
                                 <tr>
                                     <th className="py-2 px-4 border-b">ID</th>
