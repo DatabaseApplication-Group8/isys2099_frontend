@@ -20,3 +20,15 @@ export const getStaff = async () => {
     }
 
 }
+
+export const addNewStaff = async () => {
+    try {
+        const response = await fetcher.post(endpoints.staff.create);
+        console.log("Response after adding new staff:", response);
+        return response;
+    }
+    catch (error) {
+        console.log("Error adding new staff:", error);
+        throw new Error("Failed to add new staff.");
+    }
+}

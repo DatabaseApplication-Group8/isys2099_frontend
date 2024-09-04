@@ -14,7 +14,7 @@ export default {
         delete: ""
     },
     staff: {
-        create: "",
+        create: "/staff/add-new-staff",
         readOne: "",
         readAll: "/staff",
         update: "",
