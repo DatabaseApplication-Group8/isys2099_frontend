@@ -90,3 +90,19 @@ export type IRegisterProps = {
     password: string;
     passwordConfirm: string;
 }
+
+export type Staff = {
+    s_id: number;
+    job_id: number;
+    dept_id: number;
+    manager_id: number;
+    qualifications: string;
+    salary: number;
+    users: IUsers;
+}
+
+export type Jobs = {
+    job_id: number;
+    job_title: string;
+    job_description: string;   
+}

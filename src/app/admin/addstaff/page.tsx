@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { set } from "react-datepicker/dist/date_utils";
-import { Department } from "@/types/user";
+import { Department, Jobs, Staff } from "@/types/user";
+import { useUserContext } from "@/app/context";
 
 export default function AddStaff() {
   const [formData, setFormData] = useState({
@@ -21,14 +22,15 @@ export default function AddStaff() {
     salary: 0,
     qualification: "",
   });
-
+  
+  const { user, setUser } = useUserContext();
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const handleShowPassword = () => setShowPassword(!showPassword);
-  const [managerList, setManagerList] = useState([]);
-  const [jobList, setJobList] = useState([]);
+  const [managerList, setManagerList] = useState<Staff[]>([]);
+  const [jobList, setJobList] = useState<Jobs[]>([]);
   const [departmentList, setDepartmentList] = useState<Department[]>([]);
   const [today, setToday] = useState<string>("");
 
@@ -46,15 +48,32 @@ export default function AddStaff() {
           return;
         }
 
-        // Fetch managers
-        // const responseManagers = await fetch("/api/manager");
-        // const dataManagers = await responseManagers.json();
-        // setManagerList(dataManagers);
+        console.log(user.id);
+        const user_id = parseInt(localStorage.getItem("id") ?? "");
+        //Fetch managers
+        const responseAvailableManagers = await axios.get(
+          `http://localhost:8080/staff/list-staff-exclude-current-user/${encodeURIComponent(user_id)}`,{
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        const dataManagers = await responseAvailableManagers.data;
+        const dataManagersID = dataManagers.s_id;
+        setManagerList(dataManagers);
+       
+        console.log("oke nhna data managers", dataManagers); // Log or process the fetched manager data
+
 
         // Fetch jobs
-        // const responseJobs = await fetch("/api/jobs"); // Update this URL with the actual endpoint
-        // const dataJobs = await responseJobs.json();
-        // setJobList(dataJobs);
+        const responseJobs = await axios.get(
+            `http://localhost:8080/jobs`,{
+              headers: {
+                Authorization: `Bearer ${token}`, 
+            }
+      });
+       // Update this URL with the actual endpoint
+        const dataJobs = await responseJobs.data;
+        setJobList(dataJobs);
 
         // Fetch departments
         const responseDepartment = await axios.get(
@@ -70,6 +89,8 @@ export default function AddStaff() {
         const department_id = department_data.dept_id // Assuming the API returns the department details
         console.log("oke nhna", department_id); // Log or process the fetched department data
         setDepartmentList(responseDepartment.data);
+
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -105,7 +126,7 @@ export default function AddStaff() {
       );
 
       // Fetch department ID
-
+      console.log("oke nhna", formData);
       const response = await axios.post(
         "http://localhost:8080/users",
         {
@@ -119,8 +140,8 @@ export default function AddStaff() {
           sex: formData.sex,
           birth_date: birth_date,
           roles: 2,
-          job: formData.job,
-          manager: formData.manager,
+          job_id: formData.job,
+          manager_id: formData.manager,
           dept_id: formData.department,
           salary: formData.salary,
           qualifications: formData.qualification,
@@ -376,8 +397,8 @@ export default function AddStaff() {
                 >
                   <option value="" disabled>Select a manager</option>
                   {managerList.map((manager) => (
-                    <option key={manager.id} value={manager.id}>
-                      {manager.name}
+                    <option key={manager.s_id} value={manager.s_id}>
+                      {manager.users.Fname} {manager.users.Minit} {manager.users.Lname}
                     </option>
                   ))}
                 </select>
@@ -406,8 +427,8 @@ export default function AddStaff() {
                 >
                   <option value="" disabled>Select a job</option>
                   {jobList.map((job) => (
-                    <option key={job.id} value={job.id}>
-                      {job.title}
+                    <option key={job.job_id} value={job.job_id}>
+                      {job.job_title}
                     </option>
                   ))}
                 </select>
