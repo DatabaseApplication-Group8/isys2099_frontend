@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IStaff } from '@/types/user';
 import Link from 'next/link';
+import EditStaffModal from '@/components/EditStaffModal/page';
 
 export default function Staff() {
     const [error, setError] = useState<string>('');
@@ -13,8 +14,10 @@ export default function Staff() {
     const [filteredStaff, setFilteredStaff] = useState<IStaff[]>([]);
     const [searchId, setSearchId] = useState<number>();
     const [departmentFilter, setDepartmentFilter] = useState<string>('');
-    const [nameSortOrder, setNameSortOrder] = useState<'ASC' | 'DESC'>('ASC');  // Sorting order state
+    const [nameSortOrder, setNameSortOrder] = useState<'ASC' | 'DESC'>('ASC');
     const [loading, setLoading] = useState<boolean>(false);
+    const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
+    const [staffToUpdate, setStaffToUpdate] = useState<IStaff | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,6 +77,11 @@ export default function Staff() {
         setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
     };
 
+    const handleUpdateClick = (staff: IStaff) => {
+        setStaffToUpdate(staff);
+        setShowUpdateForm(true);
+    };
+
     const handleUpdateStaff = (id: number, updatedData: Partial<IStaff>) => {
         setStaffList(staffList.map(s => (s.s_id === id ? { ...s, ...updatedData } : s)));
         setFilteredStaff(filteredStaff.map(s => (s.s_id === id ? { ...s, ...updatedData } : s)));
@@ -111,7 +119,8 @@ export default function Staff() {
 
                     <div className="add-staff-field">
                         <Link href="/admin/addstaff">
-                            <button className="h-[50px] bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:shadow-lg">
+                            <button className="h-[50px] bg-[#1F2B6C] text-white py-2 px-4 rounded-md 
+                            hover:shadow-lg hover:scale-110">
                                 Add New Staff
                             </button>
                         </Link>
@@ -154,10 +163,15 @@ export default function Staff() {
                                             <td className="text-black py-2 px-4 border-b">{staff.salary}</td>
                                             <td className="text-black py-2 px-4 border-b">
                                                 <div className="flex flex-row">
-                                                    <button onClick={() => handleUpdateStaff(staff.s_id, { departments: "Updated Department" })} className="bg-blue-600 text-white py-2 px-4 rounded-md mt-2 mr-2">
+                                                    <button  
+                                                    onClick={() => handleUpdateClick(staff)}
+                                                    className="w-[81px] bg-[#1F2B6C] text-white py-2 px-4 rounded-md mt-2 mr-2 text-center
+                                                                hover:bg-blue-900">
                                                         Edit
                                                     </button>
-                                                    <button onClick={() => handleDeleteStaff(staff.s_id)} className="bg-red-600 text-white py-2 px-4 rounded-md mt-2">
+                                                    <button onClick={() => handleDeleteStaff(staff.s_id)} 
+                                                    className="w-[81px] bg-white border-2 text-black border-red-600 py-2 px-4 rounded-md mt-2 text-center
+                                                            hover:bg-red-600 hover:text-white">
                                                         Delete
                                                     </button>
                                                 </div>
@@ -178,6 +192,13 @@ export default function Staff() {
                 {successMessage && <div className="text-green-500 py-4 text-center">{successMessage}</div>}
                 {errorMessage && <div className="text-red-500 py-4 text-center">{errorMessage}</div>}
             </div>
+            {showUpdateForm && staffToUpdate && (
+                <EditStaffModal
+                    staff={staffToUpdate}
+                    onUpdate={(updatedData) => handleUpdateStaff(staffToUpdate.s_id, updatedData)}
+                    onClose={() => setShowUpdateForm(false)}
+                />
+            )}
         </main>
     );
 }
