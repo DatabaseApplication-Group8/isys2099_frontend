@@ -26,8 +26,16 @@ const Header: React.FC = () => {
                     <div className='flex w-full items-center'>
                         <div className="flex-grow flex justify-center space-x-12">
                             <Link href="/" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Home</Link>
-                            <Link href={user.role === 3 ? "/appointment" : "/staff/appointment"} className="text-[#BFD2F8] hover:text-[#FCFEFE]">Appointment</Link>
-                            <Link href={user.role === 3 ? "/treatment" : "/staff/treatment"} className="text-[#BFD2F8] hover:text-[#FCFEFE]">Treatment</Link>
+                            {user.role === 3 ? (
+                                <>
+                                    <Link href="/appointment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Appointment</Link>
+                                    <Link href="/treatment" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Treatment</Link>
+                                </>
+                            ) : user.role === 2 ? (
+                                <>
+                                    <Link href="/schedule" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Schedule</Link>
+                                </>
+                            ) : null}
                         </div>
                         <div className="flex justify-end items-center space-x-4">
                             <Link href={user.role === 3 ? '/profile' : '/staff'} className='flex items-center text-[#BFD2F8] hover:text-[#FCFEFE]'>

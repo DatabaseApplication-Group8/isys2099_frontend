@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useUserContext } from "@/app/context";
 
 export default function Staff() {
-    const {user} = useUserContext();
+
     const [error, setError] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
