@@ -145,7 +145,7 @@ export default function AdminDashboard() {
             <div className="container mx-auto px-4">
                 <h1 className="text-3xl mb-6 font-bold text-gray-900">Report Generate</h1>
 
-                <div className="flex flex-row justify-between gap-2">
+                <div className="flex flex-row gap-12 ">
                     <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
                         {dateRangeError && (

@@ -4,10 +4,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IStaff } from '@/types/user';
 import Link from 'next/link';
-import { useUserContext } from "@/app/context";
 
 export default function Staff() {
-
     const [error, setError] = useState<string>('');
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -15,8 +13,7 @@ export default function Staff() {
     const [filteredStaff, setFilteredStaff] = useState<IStaff[]>([]);
     const [searchId, setSearchId] = useState<number>();
     const [departmentFilter, setDepartmentFilter] = useState<string>('');
-    const [nameFilter, setNameFilter] = useState<string>('');
-    const [nameSortOrder, setNameSortOrder] = useState<'ASC' | 'DESC'>('ASC');  // New state for sorting order
+    const [nameSortOrder, setNameSortOrder] = useState<'ASC' | 'DESC'>('ASC');  // Sorting order state
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -57,12 +54,6 @@ export default function Staff() {
             filteredList = filteredList.filter(s => s.departments.dept_name === departmentFilter);
         }
 
-        if (nameFilter) {
-            filteredList = filteredList.filter(s =>
-                s.lastName.toLowerCase().includes(nameFilter.toLowerCase())
-            );
-        }
-
         // Apply sorting based on nameSortOrder
         if (nameSortOrder === 'ASC') {
             filteredList = filteredList.sort((a, b) => a.users.Lname.localeCompare(b.users.Lname));
@@ -71,7 +62,11 @@ export default function Staff() {
         }
 
         setFilteredStaff(filteredList);
-    }, [searchId, departmentFilter, nameFilter, nameSortOrder, staffList]);
+    }, [searchId, departmentFilter, nameSortOrder, staffList]);
+
+    const toggleNameSortOrder = () => {
+        setNameSortOrder(prevOrder => (prevOrder === 'ASC' ? 'DESC' : 'ASC'));
+    };
 
     const handleDeleteStaff = (id: number) => {
         setStaffList(staffList.filter(s => s.s_id !== id));
@@ -89,45 +84,31 @@ export default function Staff() {
         <main className="staff bg-[#E6F0FF] min-h-screen pt-4">
             <div className="container mx-auto px-4">
                 <h1 className="text-3xl mb-6 font-bold text-gray-900">Staff Database Management</h1>
-                <div className="flex flex-row justify-between">
-                    <div className="search-field">
-                        <input
-                            type="text"
-                            value={searchId}
-                            onChange={(e) => setSearchId(parseInt(e.target.value))}
-                            placeholder="Search staff by ID"
-                            className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
-                        />
+                <div className="flex flex-row justify-between mb-4">
+                    <div className="flex flex-row space-x-4">
+                        <div className="search-field">
+                            <input
+                                type="text"
+                                value={searchId}
+                                onChange={(e) => setSearchId(parseInt(e.target.value))}
+                                placeholder="Search staff by ID"
+                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                            />
+                        </div>
+
+                        <div className="filter-field flex flex-row space-x-3">
+                            <div className="filter-by-dept">
+                                <input
+                                    type="text"
+                                    value={departmentFilter}
+                                    onChange={(e) => setDepartmentFilter(e.target.value)}
+                                    placeholder="Filter by department"
+                                    className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="filter-field flex flex-row space-x-3">
-                        <div className="filter-by-name">
-                            <input
-                                type="text"
-                                value={nameFilter}
-                                onChange={(e) => setNameFilter(e.target.value)}
-                                placeholder="Filter by name"
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
-                            />
-                            <select
-                                value={nameSortOrder}
-                                onChange={(e) => setNameSortOrder(e.target.value as 'ASC' | 'DESC')}
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
-                            >
-                                <option value="ASC">Sort by Name (ASC)</option>
-                                <option value="DESC">Sort by Name (DESC)</option>
-                            </select>
-                        </div>
-                        <div className="filter-by-dept">
-                            <input
-                                type="text"
-                                value={departmentFilter}
-                                onChange={(e) => setDepartmentFilter(e.target.value)}
-                                placeholder="Filter by department"
-                                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] mb-4"
-                            />
-                        </div>
-                    </div>
                     <div className="add-staff-field">
                         <Link href="/admin/addstaff">
                             <button className="h-[50px] bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:shadow-lg">
@@ -142,12 +123,16 @@ export default function Staff() {
                         <span className="text-gray-700">Loading staff...</span>
                     </div>
                 ) : (
-                    <div className='staff-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto'>
+                    <div className="staff-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto">
                         <table className="w-full text-left">
                             <thead className="bg-[#1F2B6C] text-white">
                                 <tr>
                                     <th className="py-2 px-4 border-b">ID</th>
-                                    <th className="py-2 px-4 border-b">Name</th>
+                                    <th className="py-2 px-4 border-b cursor-pointer underline underline-offset-4 hover:shadow-lg hover:scale-110 transition-all duration-300"
+                                        onClick={toggleNameSortOrder}>
+                                            Name {nameSortOrder === 'ASC' ? '\u00A0↑' : '\u00A0↓'}
+                                    </th>
+
                                     <th className="py-2 px-4 border-b">Job</th>
                                     <th className="py-2 px-4 border-b">Email</th>
                                     <th className="py-2 px-4 border-b">Department</th>
@@ -168,7 +153,7 @@ export default function Staff() {
                                             <td className="text-black py-2 px-4 border-b">{staff.qualifications}</td>
                                             <td className="text-black py-2 px-4 border-b">{staff.salary}</td>
                                             <td className="text-black py-2 px-4 border-b">
-                                                <div className='flex flex-row'>
+                                                <div className="flex flex-row">
                                                     <button onClick={() => handleUpdateStaff(staff.s_id, { departments: "Updated Department" })} className="bg-blue-600 text-white py-2 px-4 rounded-md mt-2 mr-2">
                                                         Edit
                                                     </button>
@@ -181,21 +166,17 @@ export default function Staff() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="8" className="py-2 px-4 text-center text-gray-500">
-                                            No staff found.
-                                        </td>
+                                        <td colSpan={8} className="text-center py-4">No staff found.</td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
                 )}
-                {error && <p className="text-red-600">{error}</p>}
-                {successMessage && (
-                    <div className="fixed top-0 left-0 w-full p-4 bg-green-100 text-green-900 text-center">
-                        {successMessage}
-                    </div>
-                )}
+
+                {error && <div className="text-red-500 py-4 text-center">{error}</div>}
+                {successMessage && <div className="text-green-500 py-4 text-center">{successMessage}</div>}
+                {errorMessage && <div className="text-red-500 py-4 text-center">{errorMessage}</div>}
             </div>
         </main>
     );
