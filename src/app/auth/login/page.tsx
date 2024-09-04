@@ -40,11 +40,11 @@ export default function Login() {
       console.log(response.data);
       
       if (response.data.access_token) {
-        if (response.data.id === 1) {
+        if (response.data.role === 1) {
           window.location.href = "/admin/dashboard";
-        } else if (response.data.id === 2) {
+        } else if (response.data.role === 2) {
           window.location.href = "/staff";
-        } else if (response.data.id === 3) {
+        } else if (response.data.role === 3) {
         window.location.href = "/profile";
       } else {
         setError(response.data?.message || "Invalid email or password.");

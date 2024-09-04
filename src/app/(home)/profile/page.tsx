@@ -15,16 +15,8 @@ type Treatment = {
   status: "pending" | "completed" | "canceled";
 };
 
-type Appointment = {
-  appointment_id: number;
-  meeting_date: string;
-  purpose: string;
-  start_time: string;
-  staff: string;
-  end_time: string;
-  location: string;
-  status: "pending" | "completed" | "canceled";
-};
+
+
 
 export default function Profile() {
   const { user, setUser } = useUserContext();
