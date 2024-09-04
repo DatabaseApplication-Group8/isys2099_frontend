@@ -79,8 +79,8 @@ export default function AddStaff() {
       );
 
       const department_data = responseDepartment.data;
-      const department_id  = department_data.dept_id // Assuming the API returns the department details
-      console.log("oke nhna",department_id); // Log or process the fetched department data
+      const department_id = department_data.dept_id // Assuming the API returns the department details
+      console.log("oke nhna", department_id); // Log or process the fetched department data
 
       const response = await axios.post(
         "http://localhost:8080/users",
@@ -115,7 +115,7 @@ export default function AddStaff() {
     } catch (error: any) {
       setError(
         error.response.data.message ||
-          "An error occurred. Please try again later."
+        "An error occurred. Please try again later."
       );
     } finally {
       setLoading(false);
@@ -349,23 +349,24 @@ export default function AddStaff() {
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
             </div>
-            {/* <div className='flex flex-col space-y-2'>
-                            <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
-                            <select
-                                required
-                                id="manager"
-                                value={formData.manager}
-                                onChange={handleChange}
-                                className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
-                            >
-                                <option value="" disabled>Select a manager</option>
-                                {managerList.map((manager) => (
-                                    <option key={manager.id} value={manager.id}>
-                                        {manager.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div> */}
+            {/*
+             <div className='flex flex-col space-y-2'>
+              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+              <select
+                id="manager"
+                value={formData.manager}
+                onChange={handleChange}
+                className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C] w-full"
+              >
+                <option value="" disabled>Select a manager</option>
+                {managerList.map((manager) => (
+                  <option key={manager.id} value={manager.id}>
+                    {manager.name}
+                  </option>
+                ))}
+              </select>
+            </div>*/}
+           
             <div className="flex flex-col space-y-2">
               <label
                 htmlFor="department"
@@ -408,7 +409,6 @@ export default function AddStaff() {
                 Qualification
               </label>
               <input
-                required
                 type="text"
                 id="qualification"
                 value={formData.qualification}
@@ -488,15 +488,7 @@ export default function AddStaff() {
                 </div>
               </div>
             </div>
-            <div className="col-span-2 flex justify-between items-center mt-4">
-              <button
-                type="submit"
-                className="w-full bg-[#1F2B6C] hover:bg-[#1F2B6C] text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                disabled={loading}
-              >
-                {loading ? "Adding Staff..." : "Add Staff"}
-              </button>
-              {error && (
+            {error && (
                 <div className="col-span-2 text-red-500 text-sm font-semibold">
                   {error}
                 </div>
@@ -506,6 +498,14 @@ export default function AddStaff() {
                   {successMessage}
                 </div>
               )}
+            <div className="col-span-2 flex justify-between items-center">
+              <button
+                type="submit"
+                className="w-full bg-[#1F2B6C] hover:bg-[#1F2B6C] text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                disabled={loading}
+              >
+                {loading ? "Adding Staff..." : "Add Staff"}
+              </button>
             </div>
           </form>
         </div>
