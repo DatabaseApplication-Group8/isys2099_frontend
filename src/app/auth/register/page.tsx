@@ -31,7 +31,6 @@ export default function Register() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-
     const handleShowPassword = () => setShowPassword(!showPassword);
     const handleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 

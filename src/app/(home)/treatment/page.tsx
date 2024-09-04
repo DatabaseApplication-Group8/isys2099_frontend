@@ -114,6 +114,25 @@ export default function Treatment() {
 
             return updatedFormData;
         });
+
+        if (id === 'date') {
+            const selectedDate = new Date(value);
+            const today = new Date();
+
+            if (selectedDate.toDateString() === today.toDateString()) {
+                const now = new Date();
+                const minTime = now.toTimeString().split(' ')[0].slice(0, 5);
+                setTimeConstraints(prevConstraints => ({
+                    ...prevConstraints,
+                    minTime
+                }));
+            } else {
+                setTimeConstraints(prevConstraints => ({
+                    ...prevConstraints,
+                    minTime: '' // No minTime constraint for future dates
+                }));
+            }
+        }
     };
 
     const handleSubmit = async (event: React.FormEvent) => {

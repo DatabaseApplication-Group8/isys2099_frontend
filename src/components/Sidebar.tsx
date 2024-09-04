@@ -4,7 +4,10 @@ import Link from 'next/link';
 const Sidebar = () => {
     return (
         <div className="flex flex-col w-full text-white h-screen">
-            <div className="p-6 text-xl font-semibold">Admin Dashboard</div>
+            <Link href="/admin/dashboard">
+                <div className="p-6 text-xl font-semibold">Admin Dashboard</div>
+            </Link>
+
             <nav className="flex-1">
                 <ul className="space-y-2">
                     <li>
@@ -17,7 +20,7 @@ const Sidebar = () => {
                             Patient Management
                         </Link>
                     </li>
-                    
+
                     <li>
                         <Link href="/admin/report" className="block py-3 px-4 hover:bg-[#BFD2F8] hover:text-black">
                             Report
