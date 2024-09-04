@@ -61,14 +61,12 @@ export default function AdminDashboard() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [staffId, setStaffId] = useState('');
-    const [patientTreatmentHistory, setPatientTreatmentHistory] = useState<TreatmentHistory[]>([]);
     const [allPatientTreatments, setAllPatientTreatments] = useState<TreatmentHistory[]>([]);
     const [jobChangeHistory, setJobChangeHistory] = useState<JobChange[]>([]);
     const [doctorWork, setDoctorWork] = useState<DoctorWork[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [dateRangeError, setDateRangeError] = useState<string | null>(null);
-    const [dataFetched, setDataFetched] = useState<{ patientTreatmentHistory: boolean, allPatientTreatments: boolean, doctorWork: boolean, jobChangeHistory: boolean }>({
-        patientTreatmentHistory: false,
+    const [dataFetched, setDataFetched] = useState<{ allPatientTreatments: boolean, doctorWork: boolean, jobChangeHistory: boolean }>({
         allPatientTreatments: false,
         doctorWork: false,
         jobChangeHistory: false
@@ -105,11 +103,6 @@ export default function AdminDashboard() {
         } catch (error) {
             setErrorMessage(`Error fetching data from ${url}.`);
         }
-    };
-
-    const handleViewPatientHistory = async () => {
-        if (!validateDateRange()) return;
-        await fetchData('/api/patient-treatment-history', { startDate, endDate }, setPatientTreatmentHistory, 'date', 'patientTreatmentHistory');
     };
 
     const handleViewAllPatientTreatments = async () => {
@@ -179,7 +172,6 @@ export default function AdminDashboard() {
                             />
                         </div>
                         <div className="flex flex-row actions mt-6 space-x-6">
-                            <Button onClick={handleViewPatientHistory}>View Patient Treatment History</Button>
                             <Button onClick={handleViewAllPatientTreatments}>View All Patient Treatments</Button>
                             <Button onClick={handleViewDoctorWork}>View Doctor Work</Button>
                         </div>
@@ -209,11 +201,6 @@ export default function AdminDashboard() {
                     </div>
                 )}
 
-                {dataFetched.patientTreatmentHistory && patientTreatmentHistory.length === 0 && startDate && endDate && (
-                    <div className="text-gray-500 mb-6 text-center">
-                        No patient treatment history found for the selected date range.
-                    </div>
-                )}
                 {dataFetched.allPatientTreatments && allPatientTreatments.length === 0 && startDate && endDate && (
                     <div className="text-gray-500 mb-6 text-center">
                         No treatments found for the selected date range.
@@ -227,19 +214,6 @@ export default function AdminDashboard() {
                 {dataFetched.jobChangeHistory && jobChangeHistory.length === 0 && staffId && (
                     <div className="text-gray-500 mb-6 text-center">
                         No job change history found for the given staff ID.
-                    </div>
-                )}
-
-                {patientTreatmentHistory.length > 0 && (
-                    <div className="text-black">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Patient Treatment History</h2>
-                        <Table
-                            columns={['ID', 'Date', 'Time', 'Doctor', 'Status']}
-                            data={patientTreatmentHistory.map((treatment) => ({
-                                ...treatment,
-                                status: <span className={getStatusClass(treatment.status)}>{treatment.status}</span>,
-                            }))}
-                        />
                     </div>
                 )}
 
