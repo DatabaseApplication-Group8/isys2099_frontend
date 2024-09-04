@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { set } from "react-datepicker/dist/date_utils";
+import { Department } from "@/types/user";
 
 export default function AddStaff() {
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ export default function AddStaff() {
   const handleShowPassword = () => setShowPassword(!showPassword);
   const [managerList, setManagerList] = useState([]);
   const [jobList, setJobList] = useState([]);
-  const [departmentList, setDepartmentList] = useState([]);
+  const [departmentList, setDepartmentList] = useState<Department[]>([]);
   const [today, setToday] = useState<string>("");
 
   useEffect(() => {
@@ -37,20 +38,38 @@ export default function AddStaff() {
 
     const fetchStaff = async () => {
       try {
+        // token
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          throw new Error("No access token found.");
+          setLoading(false);
+          return;
+        }
+
         // Fetch managers
-        const responseManagers = await fetch("/api/manager");
-        const dataManagers = await responseManagers.json();
-        setManagerList(dataManagers);
+        // const responseManagers = await fetch("/api/manager");
+        // const dataManagers = await responseManagers.json();
+        // setManagerList(dataManagers);
 
         // Fetch jobs
-        const responseJobs = await fetch("/api/jobs"); // Update this URL with the actual endpoint
-        const dataJobs = await responseJobs.json();
-        setJobList(dataJobs);
+        // const responseJobs = await fetch("/api/jobs"); // Update this URL with the actual endpoint
+        // const dataJobs = await responseJobs.json();
+        // setJobList(dataJobs);
 
         // Fetch departments
-        const responseDepartments = await fetch("/api/departments"); // Update this URL with the actual endpoint
-        const dataDepartments = await responseDepartments.json();
-        setDepartmentList(dataDepartments);
+        const responseDepartment = await axios.get(
+          `http://localhost:8080/department`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+  
+        const department_data = responseDepartment.data;
+        const department_id = department_data.dept_id // Assuming the API returns the department details
+        console.log("oke nhna", department_id); // Log or process the fetched department data
+        setDepartmentList(responseDepartment.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -86,20 +105,6 @@ export default function AddStaff() {
       );
 
       // Fetch department ID
-      const responseDepartment = await axios.get(
-        `http://localhost:8080/department/find-department-id-by-name/${encodeURIComponent(
-          formData.department
-        )}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const department_data = responseDepartment.data;
-      const department_id = department_data.dept_id // Assuming the API returns the department details
-      console.log("oke nhna", department_id); // Log or process the fetched department data
 
       const response = await axios.post(
         "http://localhost:8080/users",
@@ -116,7 +121,7 @@ export default function AddStaff() {
           roles: 2,
           job: formData.job,
           manager: formData.manager,
-          dept_id: department_id,
+          dept_id: formData.department,
           salary: formData.salary,
           qualifications: formData.qualification,
         },
@@ -431,8 +436,8 @@ export default function AddStaff() {
                 >
                   <option value="" disabled>Select a department</option>
                   {departmentList.map((department) => (
-                    <option key={department.id} value={department.id}>
-                      {department.name}
+                    <option key={department.dept_id} value={department.dept_id}>
+                      {department.dept_name}
                     </option>
                   ))}
                 </select>
