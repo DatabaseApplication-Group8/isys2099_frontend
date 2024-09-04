@@ -38,10 +38,17 @@ export default function Login() {
       localStorage.setItem("id", response.data.id);
       localStorage.setItem("accessToken", response.data.access_token);
       console.log(response.data);
+      
       if (response.data.access_token) {
+        if (response.data.role === 1) {
+          window.location.href = "/admin/dashboard";
+        } else if (response.data.role === 2) {
+          window.location.href = "/staff";
+        } else if (response.data.role === 3) {
         window.location.href = "/profile";
       } else {
         setError(response.data?.message || "Invalid email or password.");
+        }
       }
     } catch (error) {
       const statusCode: string | undefined = error?.toString().split("AxiosError: Request failed with status code ")[1];
