@@ -1,103 +1,73 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useUserContext } from "@/app/context";
 import axios from 'axios';
 
+type Staff = {
+  s_id: string;
+  firstName: string;
+  mInit: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dob: string;
+  address: string;
+  qualifications: string;
+  username: string;
+  role: string;
+  salary: string; 
+};
+
 export default function Profile() {
-  const [staff, setStaff] = useState<any>(null);
+  const { user } = useUserContext();
+  const [staff, setStaff] = useState<Staff | null>(null); // Initialize as null
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
-  // Flag to toggle between mock data and real data
-  const useMockData = true;
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        if (useMockData) {
-          // Mock data
-          const mockStaffData = {
-            username: "john_doe",
-            lastName: "Doe",
-            mInit: "A",
-            firstName: "John",
-            dob: "1990-01-01",
-            role: "2",
-            email: "john.doe@example.com",
-            phone: "123-456-7890",
-            address: "123 Main St, Anytown, USA",
-            salary: "$50,000",
-            qualification: "B.Sc. Computer Science",
-          };
-          setStaff(mockStaffData);
-          setSuccessMessage('Staff data loaded successfully.');
-          setTimeout(() => {
-            setSuccessMessage('');
-          }, 5000);
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://localhost:8080/staff?id=${user.id}`, { // Correct URL
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        console.log('API Response Data:', response.data);
+
+        const currentUserStaff = response.data.find((staff: Staff) => staff.s_id === user.id);
+        console.log('Current User ID:', user.id);
+        console.log('Filtered Staff Data:', currentUserStaff);
+
+        if (currentUserStaff) {
+          console.log('Setting Staff state with:', currentUserStaff);
+          setStaff(currentUserStaff);
         } else {
-          const token = localStorage.getItem('accessToken');
-          const response = await axios.get('http://localhost:8080/staff', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-          setStaff(response.data);  // Update staff data
-          setSuccessMessage('Staff data loaded successfully.');
-          setTimeout(() => {
-            setSuccessMessage('');
-          }, 5000);
+          setErrorMessage('Staff data not found.');
         }
+
+        setSuccessMessage('Staff data loaded successfully.');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setErrorMessage('Failed to load staff data.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, []);
+  }, [user.id]);
 
-  const handleUpdateClick = () => {
-    setShowUpdateForm(true);
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = '/login';  // Redirect to login page
-  };
-
-  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      const token = localStorage.getItem('accessToken');
-      const formData = new FormData(event.currentTarget);
-      const updatedData = {
-        lastName: formData.get('lastName'),
-        mInit: formData.get('mInit'),
-        firstName: formData.get('firstName'),
-        dob: formData.get('dob'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        address: formData.get('address'),
-        qualification: formData.get('qualification'),
-      };
-      await axios.put('http://localhost:8080/staff', updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setSuccessMessage('Profile updated successfully.');
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 5000);
-      setShowUpdateForm(false); // Hide form after submission
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setErrorMessage('Failed to update profile.');
-    }
-  };
+  useEffect(() => {
+    console.log('Staff state updated:', staff);
+  }, [staff]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -110,7 +80,6 @@ export default function Profile() {
   if (!staff) {
     return <p>No staff data available.</p>;
   }
-
   return (
     <main className="profile min-h-screen bg-[#E6F0FF] py-8">
       <div className="container mx-auto flex flex-col space-y-2 lg:px-8 lg:flex-row gap-10">
@@ -125,7 +94,7 @@ export default function Profile() {
               <strong>Last Name:</strong> {staff.lastName}
             </p>
             <p className="text-gray-700 text-lg">
-              <strong>Middle Initial:</strong> {staff.mInit}
+              <strong>Middle Name:</strong> {staff.mInit}
             </p>
             <p className="text-gray-700 text-lg">
               <strong>First Name:</strong> {staff.firstName}
@@ -134,7 +103,13 @@ export default function Profile() {
               <strong>Date of Birth:</strong> {staff.dob}
             </p>
             <p className="text-gray-700 text-lg">
-              <strong>Role:</strong> {staff.role === "2" ? "Staff" : "Unknown"}
+              <strong>Role:</strong> {staff.role === 3
+                ? " - Patient"
+                : staff.role === 2
+                ? " - Staff"
+                : staff.role === 1
+                ? " - Admin"
+                : "Unknown Role"}
             </p>
             <p className="text-gray-700 text-lg">
               <strong>Email:</strong> {staff.email}
@@ -149,14 +124,14 @@ export default function Profile() {
               <strong>Salary:</strong> {staff.salary}
             </p>
             <p className="text-gray-700 text-lg">
-              <strong>Qualification:</strong> {staff.qualification}
+              <strong>Qualifications:</strong> {staff.qualifications}
             </p>
           </div>
           <div className="flex justify-end flex-row mt-4 space-x-4">
             <button
               onClick={handleUpdateClick}
               className="h-11 w-[135px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
-                            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Update Profile"
             >
               Update Profile
@@ -164,7 +139,7 @@ export default function Profile() {
             <button
               onClick={handleLogout}
               className="h-11 w-[130px] border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                            hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Log Out"
             >
               Log Out
@@ -174,7 +149,7 @@ export default function Profile() {
 
         {/* Update Form Section */}
         {showUpdateForm && (
-          <div className="lg:w-2/3 mt-1 ">
+          <div className="lg:w-2/3 mt-1">
             <h2 className="text-3xl font-semibold flex flex-col space-y-2 text-gray-900">Update Staff Profile</h2>
             <div className="mt-4 bg-[#BFD2F8] p-6 rounded-lg shadow-lg">
               <form className="container-content grid grid-cols-2 gap-3" onSubmit={handleFormSubmit}>
@@ -184,7 +159,7 @@ export default function Profile() {
                     type="text"
                     id="lastName"
                     name="lastName"
-                    defaultValue={staff.lastName}
+                    defaultValue={staff.lastName || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -194,7 +169,7 @@ export default function Profile() {
                     type="text"
                     id="mInit"
                     name="mInit"
-                    defaultValue={staff.mInit}
+                    defaultValue={staff.mInit || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -204,7 +179,7 @@ export default function Profile() {
                     type="text"
                     id="firstName"
                     name="firstName"
-                    defaultValue={staff.firstName}
+                    defaultValue={staff.firstName || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -214,7 +189,7 @@ export default function Profile() {
                     type="date"
                     id="dob"
                     name="dob"
-                    defaultValue={staff.dob}
+                    defaultValue={staff.dob || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -224,7 +199,7 @@ export default function Profile() {
                     type="email"
                     id="email"
                     name="email"
-                    defaultValue={staff.email}
+                    defaultValue={staff.email || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -234,7 +209,7 @@ export default function Profile() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    defaultValue={staff.phone}
+                    defaultValue={staff.phone || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
@@ -244,40 +219,32 @@ export default function Profile() {
                     type="text"
                     id="address"
                     name="address"
-                    defaultValue={staff.address}
+                    defaultValue={staff.address || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
                 <div className="flex flex-col space-y-2">
-                  <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
+                  <label htmlFor="qualifications" className="text-sm font-semibold text-[#1F2B6C]">Qualifications</label>
                   <input
                     type="text"
-                    id="qualification"
-                    name="qualification"
-                    defaultValue={staff.qualification}
+                    id="qualifications"
+                    name="qualifications"
+                    defaultValue={staff.qualifications || ""}
                     className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                   />
                 </div>
-                <div className="flex justify-end flex-row mt-4 col-span-2 space-x-4">
+                <div className="col-span-2 mt-4 flex justify-end">
                   <button
                     type="submit"
-                    className="h-11 w-[135px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
-                                  hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-label="Save Changes"
+                    className="h-11 w-[130px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
+                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Save Changes
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowUpdateForm(false)}
-                    className="h-11 w-32 border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center
-                                  hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    aria-label="Cancel"
-                  >
-                    Cancel
-                  </button>
                 </div>
               </form>
+              {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
+              {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
           </div>
         )}

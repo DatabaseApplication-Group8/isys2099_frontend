@@ -9,7 +9,9 @@ interface Staff {
   email: string;
   phone: string;
   address: string;
+  job: string;
   qualification: string;
+  salary: number;
 }
 
 interface EditStaffModalProps {
