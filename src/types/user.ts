@@ -101,6 +101,15 @@ export type Staff = {
     users: IUsers;
 }
 
+export type updateStaffDto = {
+    firstName: string;
+    mInit: string;
+    lastName: string;
+    phone: string;
+    dob : string;
+    qualifications : string;
+}
+
 export type Jobs = {
     job_id: number;
     job_title: string;

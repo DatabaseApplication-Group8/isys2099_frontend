@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { useUserContext } from "@/app/context";
 import axios from 'axios';
-import { Staff } from "@/types/user";
+import { IUsers, Staff, updateStaffDto } from "@/types/user";
+import { set } from "react-datepicker/dist/date_utils";
 
 export default function Profile() {
   const { user, setUser } = useUserContext();
@@ -11,7 +12,11 @@ export default function Profile() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
+  const [userId, setId] = useState<number>(0);
+  const [role, setRole] = useState<number>(0);
   const [today, setToday] = useState<string>("");
+  const [updatedDataFE, setUpdatedDataFE] = useState<updateStaffDto | null>(null);
+  const [updated, setUpdated] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     lastName: '',
     mInit: '',
@@ -39,6 +44,9 @@ export default function Profile() {
     const fetchData = async () => {
       const token = localStorage.getItem('accessToken');
       const id = localStorage.getItem("id");
+      const role = localStorage.getItem("role");
+      setId(Number(id));
+      setRole(Number(role));
 
       if (!token || !id) {
         setErrorMessage("No authentication token or ID found.");
@@ -67,14 +75,16 @@ export default function Profile() {
           qualifications: response.data.qualifications || '',
           salary: response.data.salary
         });
-
+        console.log(response.data);
         setSuccessMessage('Staff data loaded successfully.');
+
         setTimeout(() => setSuccessMessage(''), 5000);
       } catch (error: any) {
         console.error('Error fetching data:', error);
         setErrorMessage(error.response?.data?.message || 'Failed to fetch staff data.');
       } finally {
         setLoading(false);
+        setUpdated(false);
       }
     };
 
@@ -126,12 +136,26 @@ export default function Profile() {
 
       const { salary, ...updatedData } = formData;
       const updatedStaff = { ...staff, ...updatedData };
-      await axios.put('http://localhost:8080/staff/profile', updatedStaff, {
+      console.log(userId,role);
+      console.log(updatedStaff);
+      setUpdatedDataFE(updatedStaff);
+      await axios.patch(`http://localhost:8080/users/update-staff/${encodeURIComponent(userId)}/${encodeURIComponent(role)}`, {
+        Fname: updatedStaff.firstName,
+        Minit: updatedStaff.mInit,
+        Lname: updatedStaff.lastName,
+        birth_date: new Date(updatedStaff.dob),
+        phone: updatedStaff.phone,
+        // email: updatedStaff.users.email,
+        // salary: updatedStaff.salary,
+        qualifications: updatedStaff.qualifications
+      }, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
+      setUpdated(true)
+      console.log("Updated: ", updated); 
       setSuccessMessage('Profile updated successfully.');
       setTimeout(() => setSuccessMessage(''), 5000);
       // Optionally reset formData or staff state here if needed
@@ -160,16 +184,16 @@ export default function Profile() {
                   <strong>Username:</strong> {staff.users.username}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Last Name:</strong> {staff.users.Lname}
+                  <strong>Last Name:</strong> {updated ? updatedDataFE?.lastName :staff.users.Lname}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Middle Name:</strong> {staff.users.Minit}
+                  <strong>Middle Name:</strong> {updated ? updatedDataFE?.mInit : staff.users.Minit}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>First Name:</strong> {staff.users.Fname}
+                  <strong>First Name:</strong> {updated ? updatedDataFE?.firstName :staff.users.Fname}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Date of Birth:</strong> {staff.users.birth_date ? formatDate(staff.users.birth_date) : 'N/A'}
+                  <strong>Date of Birth:</strong> {updated? formatDate(updatedDataFE?.dob ?? '') : (staff.users.birth_date ? formatDate(staff.users.birth_date) : 'N/A')}
                 </p>
                 <p className="text-gray-700 text-lg">
                   <strong>Role:</strong> {staff.users.role === 3
@@ -184,13 +208,13 @@ export default function Profile() {
                   <strong>Email:</strong> {staff.users.email}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Phone:</strong> {staff.users.phone}
+                  <strong>Phone:</strong> {updated ? updatedDataFE?.phone : staff.users.phone}
                 </p>
                 <p className="text-gray-700 text-lg">
                   <strong>Salary:</strong> {staff.salary}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Qualifications:</strong> {staff.qualifications}
+                  <strong>Qualifications:</strong> {updated ? updatedDataFE?.qualifications : staff.qualifications}
                 </p>
               </>
             ) : (
@@ -229,7 +253,7 @@ export default function Profile() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -239,7 +263,7 @@ export default function Profile() {
                     name="mInit"
                     value={formData.mInit}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -249,7 +273,7 @@ export default function Profile() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -260,7 +284,7 @@ export default function Profile() {
                     max={today}
                     value={formData.dob}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -270,7 +294,7 @@ export default function Profile() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                     readOnly
                   />
                 </div>
@@ -281,7 +305,7 @@ export default function Profile() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -290,7 +314,7 @@ export default function Profile() {
                     name="qualifications"
                     value={formData.qualifications}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -300,7 +324,7 @@ export default function Profile() {
                     name="salary"
                     value={formData.salary}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                     readOnly
                   />
                 </div>
