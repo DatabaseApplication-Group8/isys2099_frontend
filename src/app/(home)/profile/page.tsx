@@ -15,9 +15,6 @@ type Treatment = {
   status: "pending" | "completed" | "canceled";
 };
 
-
-
-
 export default function Profile() {
   const { user, setUser } = useUserContext();
   const [treatments, setTreatments] = useState<Treatment[]>([]);
