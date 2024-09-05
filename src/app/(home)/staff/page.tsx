@@ -2,21 +2,7 @@
 import { useState, useEffect } from "react";
 import { useUserContext } from "@/app/context";
 import axios from 'axios';
-
-type Staff = {
-  id: string;
-  firstName: string;
-  mInit: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  dob: string;
-  address: string;
-  qualifications: string;
-  username: string;
-  role: number;
-  salary: string;
-};
+import { Staff } from "@/types/user";
 
 export default function Profile() {
   const { user, setUser } = useUserContext();
@@ -38,13 +24,15 @@ export default function Profile() {
 
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/staff/profile/?id=${id}`, {
+        const response = await axios.get(`http://localhost:8080/staff/profile/${encodeURIComponent(id)}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
         setStaff(response.data);
+        console.log('Staff data:', response.data);
+        console.log('Staff state:', staff);
         setSuccessMessage('Staff data loaded successfully.');
         setTimeout(() => setSuccessMessage(''), 5000);
       } catch (error: any) {
@@ -117,38 +105,38 @@ export default function Profile() {
             {staff ? (
               <>
                 <p className="text-gray-700 text-lg">
-                  <strong>Username:</strong> {staff.username}
+                  <strong>Username:</strong> {staff.users.username}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Last Name:</strong> {staff.lastName}
+                  <strong>Last Name:</strong> {staff.users.Lname}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Middle Name:</strong> {staff.mInit}
+                  <strong>Middle Name:</strong> {staff.users.Minit}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>First Name:</strong> {staff.firstName}
+                  <strong>First Name:</strong> {staff.users.Fname}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Date of Birth:</strong> {staff.dob}
+                  <strong>Date of Birth:</strong> {staff.users.birth_date}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Role:</strong> {staff.role === 3
+                  <strong>Role:</strong> {staff.users.role === 3
                     ? " - Patient"
-                    : staff.role === 2
+                    : staff.users.role === 2
                       ? " - Staff"
-                      : staff.role === 1
+                      : staff.users.role === 1
                         ? " - Admin"
                         : "Unknown Role"}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Email:</strong> {staff.email}
+                  <strong>Email:</strong> {staff.users.email}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Phone:</strong> {staff.phone}
+                  <strong>Phone:</strong> {staff.users.phone}
                 </p>
-                <p className="text-gray-700 text-lg">
-                  <strong>Address:</strong> {staff.address}
-                </p>
+                {/* <p className="text-gray-700 text-lg">
+                  <strong>Address:</strong> {staff.users}
+                </p> */}
                 <p className="text-gray-700 text-lg">
                   <strong>Salary:</strong> {staff.salary}
                 </p>
