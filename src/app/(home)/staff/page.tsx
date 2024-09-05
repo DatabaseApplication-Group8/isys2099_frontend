@@ -11,8 +11,31 @@ export default function Profile() {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
+  const [today, setToday] = useState<string>("");
+  const [formData, setFormData] = useState({
+    lastName: '',
+    mInit: '',
+    firstName: '',
+    dob: '',
+    email: '',
+    phone: '',
+    qualifications: '',
+    salary: 0
+  });
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
+    const todayDate = new Date().toISOString().split("T")[0];
+    setToday(todayDate);
+
     const fetchData = async () => {
       const token = localStorage.getItem('accessToken');
       const id = localStorage.getItem("id");
@@ -31,8 +54,20 @@ export default function Profile() {
         });
 
         setStaff(response.data);
-        console.log('Staff data:', response.data);
-        console.log('Staff state:', staff);
+
+        const dob = response.data.users.birth_date ? formatDate(response.data.users.birth_date) : '';
+
+        setFormData({
+          lastName: response.data.users.Lname || '',
+          mInit: response.data.users.Minit || '',
+          firstName: response.data.users.Fname || '',
+          dob: dob,
+          email: response.data.users.email || '',
+          phone: response.data.users.phone || '',
+          qualifications: response.data.qualifications || '',
+          salary: response.data.salary
+        });
+
         setSuccessMessage('Staff data loaded successfully.');
         setTimeout(() => setSuccessMessage(''), 5000);
       } catch (error: any) {
@@ -46,10 +81,6 @@ export default function Profile() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    console.log('Staff state updated:', staff);
-  }, [staff]);
-
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('id');
@@ -60,9 +91,32 @@ export default function Profile() {
     setShowUpdateForm(!showUpdateForm);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+  };
+
+  const validateForm = () => {
+    let errors: { [key: string]: string } = {};
+
+    if (!/^\d{10}$/.test(formData.phone)) {
+      errors.phone = "Phone number must be exactly 10 digits.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setErrorMessage(Object.values(errors).join(" "));
+      return false;
+    }
+
+    setErrorMessage("");
+    return true;
+  };
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!staff) return; // Prevent submission if staff is null
+    if (!staff) return;
+
+    if (!validateForm()) return; // Validate before submission
 
     try {
       const token = localStorage.getItem('accessToken');
@@ -70,9 +124,8 @@ export default function Profile() {
         throw new Error("No authentication token found.");
       }
 
-      // Gather form data here, for example:
-      const updatedStaff = { ...staff }; // Replace with actual form data
-
+      const { salary, ...updatedData } = formData;
+      const updatedStaff = { ...staff, ...updatedData };
       await axios.put('http://localhost:8080/staff/profile', updatedStaff, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -81,6 +134,7 @@ export default function Profile() {
 
       setSuccessMessage('Profile updated successfully.');
       setTimeout(() => setSuccessMessage(''), 5000);
+      // Optionally reset formData or staff state here if needed
     } catch (error: any) {
       console.error('Error updating profile:', error);
       setErrorMessage(error.response?.data?.message || 'Failed to update profile.');
@@ -94,11 +148,9 @@ export default function Profile() {
   if (errorMessage) {
     return <p className="text-red-500">{errorMessage}</p>;
   }
-
   return (
     <main className="profile min-h-screen bg-[#E6F0FF] py-8">
       <div className="container mx-auto flex flex-col space-y-2 lg:px-8 lg:flex-row gap-10">
-        {/* Personal Profile Section */}
         <div className="lg:w-1/3 mt-1">
           <h2 className="text-3xl font-semibold flex flex-col space-y-2 text-gray-900">Staff Personal Profile</h2>
           <div className="mt-4 bg-white p-6 rounded-lg shadow-lg">
@@ -117,15 +169,15 @@ export default function Profile() {
                   <strong>First Name:</strong> {staff.users.Fname}
                 </p>
                 <p className="text-gray-700 text-lg">
-                  <strong>Date of Birth:</strong> {staff.users.birth_date}
+                  <strong>Date of Birth:</strong> {staff.users.birth_date ? formatDate(staff.users.birth_date) : 'N/A'}
                 </p>
                 <p className="text-gray-700 text-lg">
                   <strong>Role:</strong> {staff.users.role === 3
-                    ? " - Patient"
+                    ? " Patient"
                     : staff.users.role === 2
-                      ? " - Staff"
+                      ? " Staff"
                       : staff.users.role === 1
-                        ? " - Admin"
+                        ? " Admin"
                         : "Unknown Role"}
                 </p>
                 <p className="text-gray-700 text-lg">
@@ -134,9 +186,6 @@ export default function Profile() {
                 <p className="text-gray-700 text-lg">
                   <strong>Phone:</strong> {staff.users.phone}
                 </p>
-                {/* <p className="text-gray-700 text-lg">
-                  <strong>Address:</strong> {staff.users}
-                </p> */}
                 <p className="text-gray-700 text-lg">
                   <strong>Salary:</strong> {staff.salary}
                 </p>
@@ -168,25 +217,113 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Update Form Section */}
         {showUpdateForm && (
           <div className="lg:w-2/3 mt-1">
             <h2 className="text-3xl font-semibold flex flex-col space-y-2 text-gray-900">Update Staff Profile</h2>
             <div className="mt-4 bg-[#BFD2F8] p-6 rounded-lg shadow-lg">
-              <form className="container-content grid grid-cols-2 gap-3" onSubmit={handleFormSubmit}>
-                {/* Form fields for updating staff details */}
-                <div className="col-span-2 mt-4 flex justify-end">
+              <form className="container-content grid grid-cols-2 gap-4" onSubmit={handleFormSubmit}>
+                <div>
+                  <label className="block text-gray-700">Last Name:</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Middle Name:</label>
+                  <input
+                    type="text"
+                    name="mInit"
+                    value={formData.mInit}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">First Name:</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Date of Birth:</label>
+                  <input
+                    type="date"
+                    name="dob"
+                    max={today}
+                    value={formData.dob}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Email:</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Phone:</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Qualifications:</label>
+                  <input
+                    name="qualifications"
+                    value={formData.qualifications}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700">Salary:</label>
+                  <input
+                    type="number"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded"
+                    readOnly
+                  />
+                </div>
+                {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
+                {successMessage && <p className="text-green-500 mt-4">{successMessage}</p>}
+                <div className="col-span-2 flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowUpdateForm(false)}
+                    className="h-11 w-[130px] border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="submit"
-                    className="h-11 w-[130px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center
-                              hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="h-11 w-[135px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     Save Changes
                   </button>
                 </div>
+
               </form>
-              {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
-              {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+
             </div>
           </div>
         )}
