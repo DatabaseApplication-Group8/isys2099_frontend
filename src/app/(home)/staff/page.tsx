@@ -82,9 +82,8 @@ export default function Profile() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('id');
-    // Redirect to login page or perform other logout actions
+    localStorage.clear();
+    window.location.href = "/";
   };
 
   const handleUpdateClick = () => {
@@ -229,7 +228,7 @@ export default function Profile() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -239,7 +238,7 @@ export default function Profile() {
                     name="mInit"
                     value={formData.mInit}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -249,7 +248,7 @@ export default function Profile() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -260,7 +259,7 @@ export default function Profile() {
                     max={today}
                     value={formData.dob}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -270,7 +269,7 @@ export default function Profile() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                     readOnly
                   />
                 </div>
@@ -281,7 +280,7 @@ export default function Profile() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -290,7 +289,7 @@ export default function Profile() {
                     name="qualifications"
                     value={formData.qualifications}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
                 <div>
@@ -300,7 +299,7 @@ export default function Profile() {
                     name="salary"
                     value={formData.salary}
                     onChange={handleInputChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded"
                     readOnly
                   />
                 </div>
