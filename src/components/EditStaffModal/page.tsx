@@ -66,6 +66,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
         setManagerList(managersResponse.data);
         setJobList(jobsResponse.data);
         setDepartmentList(departmentsResponse.data);
+
         setToday(new Date().toISOString().split("T")[0]);
 
       } catch (error) {
@@ -76,7 +77,6 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
     fetchLists();
   }, [formData.id]);
-
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
