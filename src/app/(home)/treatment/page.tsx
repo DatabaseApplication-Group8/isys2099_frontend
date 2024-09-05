@@ -35,7 +35,7 @@ export default function Treatment() {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
-                }); // Replace with your API endpoint
+                }); 
 
                 const data = response.data;
                 console.log(data);

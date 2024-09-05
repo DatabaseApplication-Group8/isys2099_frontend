@@ -33,7 +33,7 @@ const Header: React.FC = () => {
                                 </>
                             ) : user.role === 2 ? (
                                 <>
-                                    <Link href="/schedule" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Schedule</Link>
+                                    <Link href="/staff/schedule" className="text-[#BFD2F8] hover:text-[#FCFEFE]">Schedule</Link>
                                 </>
                             ) : null}
                         </div>
