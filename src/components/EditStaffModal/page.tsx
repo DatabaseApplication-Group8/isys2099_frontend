@@ -34,13 +34,14 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
     event.preventDefault();
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.put('http://localhost:8080/staff/profile?id=${id}', formData, {
+      await axios.put('http://localhost:8080/staff/profile/${encodeURIComponent(id)}', formData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       onUpdate(formData);
       setSuccessMessage('Profile updated successfully.');
+      console.log(formData);
       setTimeout(() => {
         setSuccessMessage('');
         onClose();
