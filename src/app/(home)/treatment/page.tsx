@@ -173,6 +173,7 @@ export default function Treatment() {
                   response.data.data.start_time.slice(11, 16) || "N/A"
                 }</span> to <span style="color: red;">${response.data.data.end_time.slice(11, 16) || "N/A"}</span><br/>
                 With doctor: <span style="color: red;">${response.data.data.staff.users.Fname || "N/A"}</span><br/>
+                Billing: <span style="color: red;">${response.data.data.billing}$</span><br/>
                 Treatment's description: <span style="color: red;">${formData.description || "N/A"}</span><br/>
             `);
             // Reset form data
@@ -183,7 +184,7 @@ export default function Treatment() {
                 doctor: "",
                 description: "",
             });
-
+            setError("");
             setTimeout(() => {
                 setSuccessMessage(null);
             }, 10000); // Message will disappear after 10 seconds

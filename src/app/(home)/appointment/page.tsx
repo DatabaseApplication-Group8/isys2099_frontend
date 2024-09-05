@@ -182,7 +182,7 @@ export default function Appointment() {
         meeting_status: "",
         note: "",
       });
-
+      setError("");
       setTimeout(() => {
         setSuccessMessage("");
       }, 10000); // Message will disappear after 10 seconds
