@@ -207,6 +207,7 @@ export default function Profile() {
                         <td className="py-2 px-4 border-b text-black">{treatment.end_time.slice(11, 16)}</td>
                         <td className="py-2 px-4 border-b text-black">{treatment.staff.users.Fname}</td>
                         <td className="py-2 px-4 border-b text-black">{treatment.description}</td>
+                        <td className="py-2 px-4 border-b text-black">{treatment.billing} $</td>
                       </tr>
                     ))
                   ) : (
