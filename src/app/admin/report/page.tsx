@@ -171,7 +171,7 @@ export default function AdminDashboard() {
                                 placeholder="End Date"
                             />
                         </div>
-                        <div className="flex flex-row actions mt-6 space-x-6">
+                        <div className="flex flex-row actions mt-6">
                             <Button onClick={handleViewAllPatientTreatments}>View All Patient Treatments</Button>
                             <Button onClick={handleViewDoctorWork}>View Doctor Work</Button>
                         </div>

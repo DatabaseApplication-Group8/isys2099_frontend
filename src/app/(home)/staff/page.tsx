@@ -92,9 +92,8 @@ export default function Profile() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('id');
-    // Redirect to login page or perform other logout actions
+    localStorage.clear();
+    window.location.href = "/";
   };
 
   const handleUpdateClick = () => {

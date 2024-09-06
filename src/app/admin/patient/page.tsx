@@ -120,8 +120,8 @@ export default function Patient() {
 
          
         </div>
-        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 max-h-[400px] overflow-y-auto">
+          <table className="rounded-md text-left w-full">
             <thead className="bg-[#1F2B6C] text-white">
               <tr>
                 <th className="py-3 px-4 border-b">ID</th>
