@@ -164,7 +164,7 @@ export default function Login() {
             </div>
 
             <div className="flex justify-center items-center mt-3">
-              <Link href="/register" className="text-[#1F2B6C] hover:text-[#1D3F7F] text-sm">
+              <Link href="/auth/register" className="text-[#1F2B6C] hover:text-[#1D3F7F] text-sm">
                 Don’t have an account? <span className="text-red-500">Register</span>
               </Link>
             </div>

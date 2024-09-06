@@ -120,7 +120,7 @@ export default function Patient() {
 
          
         </div>
-        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 max-h-[400px] overflow-y-auto">
+        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto">
           <table className="rounded-md text-left w-full">
             <thead className="bg-[#1F2B6C] text-white">
               <tr>
@@ -156,8 +156,12 @@ export default function Patient() {
                     <td className="text-black py-2 px-4 border-b">{patient.users.email}</td>
                     <td className="text-black py-2 px-4 border-b">{patient.users.phone}</td>
                     <td className="text-black py-2 px-4 border-b">{patient.users.birth_date.slice(0,10)}</td>
-                    <td className="text-black py-2 px-4 border-b">{patient.users.patients.address}</td>
-                    <td className="text-black py-2 px-4 border-b">{patient.users.patients.allergies}</td>
+                    <td className="text-black py-2 px-4 border-b">
+                      {patient.users.patients.address ? patient.users.patients.address : "N/A"}
+                    </td>
+                    <td className="text-black py-2 px-4 border-b">
+                      {patient.users.patients.allergies ? patient.users.patients.allergies : "N/A"}
+                    </td>
                   </tr>
                 ))
               )}
@@ -186,7 +190,7 @@ export default function Patient() {
                     <strong>Phone:</strong> {filteredPatient.phone}
                   </p>
                   <p className="text-gray-700 text-lg">
-                    <strong>DOB:</strong> {filteredPatient.dob}
+                    <strong>Birth_date:</strong> {filteredPatient.dob}
                   </p>
                   <p className="text-gray-700 text-lg">
                     <strong>Address:</strong> {filteredPatient.address}

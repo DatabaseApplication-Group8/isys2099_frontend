@@ -25,38 +25,6 @@ type DoctorWork = {
     treatmentId: string;
 };
 
-const Button = ({ onClick, children }: { onClick: () => void; children: React.ReactNode }) => (
-    <button
-        onClick={onClick}
-        className="bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
-    >
-        {children}
-    </button>
-);
-
-const Table = ({ columns, data }: { columns: string[], data: any[] }) => (
-    <div className="bg-white rounded-lg shadow-lg mb-6">
-        <table className="w-full text-left border-collapse">
-            <thead className="bg-[#1F2B6C] text-white">
-                <tr>
-                    {columns.map((col, index) => (
-                        <th key={index} className="py-3 px-4 border-b">{col}</th>
-                    ))}
-                </tr>
-            </thead>
-            <tbody>
-                {data.map((row, rowIndex) => (
-                    <tr key={rowIndex} className="hover:bg-gray-100 transition-colors">
-                        {Object.values(row).map((val, colIndex) => (
-                            <td key={colIndex} className="py-2 px-4 border-b">{val}</td>
-                        ))}
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-);
-
 export default function AdminDashboard() {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -71,8 +39,23 @@ export default function AdminDashboard() {
         doctorWork: false,
         jobChangeHistory: false
     });
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
-    // Validate date range
+    const formatTime = (timeString: string) => {
+        if (!timeString) return '';
+        const date = new Date(timeString);
+        const hours = String(date.getUTCHours()).padStart(2, '0');
+        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
     const validateDateRange = () => {
         if (!startDate || !endDate) {
             setDateRangeError('Both start date and end date are required.');
@@ -93,34 +76,44 @@ export default function AdminDashboard() {
         });
     };
 
-    const fetchData = async (url: string, params: object, setter: React.Dispatch<React.SetStateAction<any[]>>, dateKey: string, key: keyof typeof dataFetched) => {
+
+    const fetchData = async (
+        url: string,
+        params: object,
+        setter: React.Dispatch<React.SetStateAction<any[]>>,
+        dateKey: string,
+        key: keyof typeof dataFetched
+    ) => {
         try {
             const response = await axios.get(url, { params });
             const filteredData = filterDataByDateRange(response.data, dateKey);
             setter(filteredData);
             setDataFetched(prev => ({ ...prev, [key]: true }));
-            setErrorMessage(null);
         } catch (error) {
             setErrorMessage(`Error fetching data from ${url}.`);
         }
     };
 
+
     const handleViewAllPatientTreatments = async () => {
         if (!validateDateRange()) return;
-        await fetchData('/api/all-patient-treatments', { startDate, endDate }, setAllPatientTreatments, 'date', 'allPatientTreatments');
 
-        const response = await axios.get(
-            `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          );
-        console.log(response.data);
-        setAllPatientTreatments(response.data);
-
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                }
+            );
+            setAllPatientTreatments(response.data);
+            setErrorMessage(null); // Reset error if the request is successful
+        } catch (error) {
+            setErrorMessage('Error fetching patient treatments.');
+        }
     };
+
 
     const handleViewDoctorWork = async () => {
         if (!validateDateRange()) return;
@@ -136,21 +129,13 @@ export default function AdminDashboard() {
         try {
             const response = await axios.get('/api/job-change-history', { params: { staffId } });
             setJobChangeHistory(response.data);
-            setErrorMessage(null);
+            setErrorMessage(null); // Reset error if successful
             setDataFetched(prev => ({ ...prev, jobChangeHistory: true }));
         } catch (error) {
             setErrorMessage('Error fetching job change history.');
         }
     };
 
-    const getStatusClass = (status: string) => {
-        switch (status) {
-            case 'completed': return 'text-green-500';
-            case 'canceled': return 'text-red-500';
-            case 'pending': return 'text-blue-500';
-            default: return 'text-gray-500';
-        }
-    };
 
     return (
         <main className="admin-dashboard bg-[#E6F0FF] min-h-screen pt-4">
@@ -158,7 +143,7 @@ export default function AdminDashboard() {
                 <h1 className="text-3xl mb-6 font-bold text-gray-900">Report Generate</h1>
 
                 <div className="flex flex-row gap-12 ">
-                    <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6">
+                    <div className="filter-section w-2/3 bg-white p-6 rounded-lg shadow-lg mb-6">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
                         {dateRangeError && (
                             <div className="text-red-500 mb-2 text-end">
@@ -183,13 +168,19 @@ export default function AdminDashboard() {
                                 placeholder="End Date"
                             />
                         </div>
-                        <div className="flex flex-row actions mt-6">
-                            <Button onClick={handleViewAllPatientTreatments}>View All Patient Treatments</Button>
-                            <Button onClick={handleViewDoctorWork}>View Doctor Work</Button>
+                        <div className="flex flex-row actions space-x-10 mt-6">
+                            <button className="w-full bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
+                                onClick={handleViewAllPatientTreatments}>
+                                View All Patient Treatments
+                            </button>
+                            <button className="w-full bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
+                                onClick={handleViewDoctorWork}>
+                                View Doctor Work
+                            </button>
                         </div>
                     </div>
 
-                    <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col justify-between">
+                    <div className="filter-section w-1/3 bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col justify-between">
                         <div className="flex flex-col">
                             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by Staff ID</h2>
                             <input
@@ -201,8 +192,11 @@ export default function AdminDashboard() {
                             />
                         </div>
 
-                        <div className="w-full">
-                            <Button onClick={handleViewJobChangeHistory}>View Job Change History</Button>
+                        <div className="w-full flex justify-center">
+                            <button className="w-full bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
+                                onClick={handleViewJobChangeHistory}>
+                                View Job Change History
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -232,33 +226,96 @@ export default function AdminDashboard() {
                 {allPatientTreatments.length > 0 && (
                     <div className="text-black">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">All Patient Treatments</h2>
-                        <Table
-                            columns={['Treatment Id', 'Patient Id', 'Doctor Id', 'Description', 'Treatment Date', 'Start Time', "End Time", 'Billing']}
-                            data={allPatientTreatments.map((treatment) => ({
-                                ...treatment,
-                                status: <span className={getStatusClass(treatment.status)}>{treatment.status}</span>,
-                            }))}
-                        />
+                        <table className="bg-white rounded-md text-left w-full">
+                            <thead className="bg-[#1F2B6C] text-white">
+                                <tr>
+                                    <th className="py-3 px-4 border-b">Treatment Id</th>
+                                    <th className="py-3 px-4 border-b">Patient Id</th>
+                                    <th className="py-3 px-4 border-b">Doctor Id</th>
+                                    <th className="py-3 px-4 border-b">Description</th>
+                                    <th className="py-3 px-4 border-b">Treatment Date</th>
+                                    <th className="py-3 px-4 border-b">Start Time</th>
+                                    <th className="py-3 px-4 border-b">End Time</th>
+                                    <th className="py-3 px-4 border-b">Billing</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {allPatientTreatments.map((treatment) => (
+                                    <tr key={treatment.id}>
+                                        <td className="py-2 px-4 border-b">{treatment.t_id}</td>
+                                        <td className="py-2 px-4 border-b">{treatment.p_id}</td>
+                                        <td className="py-2 px-4 border-b">{treatment.doctor_id}</td>
+                                        <td className="py-2 px-4 border-b">{treatment.description}</td>
+                                        <td className="py-2 px-4 border-b">
+                                            {formatDate(treatment.treatment_date)}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">
+                                            {formatTime(treatment.start_time)}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">
+                                            {formatTime(treatment.end_time)}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">{treatment.billing}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
 
                 {doctorWork.length > 0 && (
                     <div className="text-black">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Doctor Work Report</h2>
-                        <Table
-                            columns={['Doctor ID', 'Patient ID', 'Treatment Date', 'Treatment ID']}
-                            data={doctorWork}
-                        />
+                        <table className="bg-white rounded-md text-left w-full">
+                            <thead className="bg-[#1F2B6C] text-white">
+                                <tr>
+                                    <th className="py-3 px-4 border-b">Doctor Id</th>
+                                    <th className="py-3 px-4 border-b">Patient Id</th>
+                                    <th className="py-3 px-4 border-b">Treatment Date</th>
+                                    <th className="py-3 px-4 border-b">Treatment ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {doctorWork.map((schedule) => (
+                                    <tr key={schedule.id}>
+                                        <td className="py-2 px-4 border-b">{schedule.doctor_id}</td>
+                                        <td className="py-2 px-4 border-b">{schedule.p_id}</td>
+                                        <td className="py-2 px-4 border-b">
+                                            {formatDate(schedule.treatment_date)}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">{schedule.t_id}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
 
                 {jobChangeHistory.length > 0 && (
                     <div className="text-black">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Job Change History</h2>
-                        <Table
-                            columns={['Staff ID', 'Change Date', 'Previous Role', 'New Role']}
-                            data={jobChangeHistory}
-                        />
+                        <table className="bg-white rounded-md text-left w-full">
+                            <thead className="bg-[#1F2B6C] text-white">
+                                <tr>
+                                    <th className="py-3 px-4 border-b">Staff ID</th>
+                                    <th className="py-3 px-4 border-b">Date Change</th>
+                                    <th className="py-3 px-4 border-b">Previous Job</th>
+                                    <th className="py-3 px-4 border-b">New Job</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {jobChangeHistory.map((jobs) => (
+                                    <tr key={jobs.id}>
+                                        <td className="py-2 px-4 border-b">{jobs.s_id}</td>
+                                        <td className="py-2 px-4 border-b">
+                                            {formatDate(jobs.start_date)}
+                                        </td>
+                                        <td className="py-2 px-4 border-b">{jobs.job_history}</td>
+                                        <td className="py-2 px-4 border-b">{jobs.job_title}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

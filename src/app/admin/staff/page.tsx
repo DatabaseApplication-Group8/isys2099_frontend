@@ -165,8 +165,8 @@ export default function Staff() {
           </div>
         ) : (
           <div className="staff-database-container bg-white rounded-lg shadow-lg mb-6">
-            <table className="w-full rounded-md text-left h-[500px] overflow-y-auto block">
-              <thead className="bg-[#1F2B6C] text-white w-full">
+            <table className="w-full rounded-md text-left">
+              <thead className="bg-[#1F2B6C] text-white">
                 <tr>
                   <th className="py-2 px-4 border-b">ID</th>
                   <th
@@ -195,7 +195,7 @@ export default function Staff() {
                         {staff.users.Fname} {staff.users.Lname}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
-                        {staff.jobs.job_id}
+                        {staff.jobs.job_title} 
                       </td>
                       <td className="text-black py-2 px-4 border-b">
                         {staff.users.email}
@@ -204,7 +204,7 @@ export default function Staff() {
                         {staff.departments.dept_name}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
-                        {staff.qualifications}
+                        {staff.qualifications ? staff.qualifications : "N/A"}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
                         {staff.salary}
