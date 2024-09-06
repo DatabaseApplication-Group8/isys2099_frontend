@@ -1,3 +1,4 @@
+
 export type IPatient = {
     username: string;
     firstName: string;
@@ -16,10 +17,11 @@ export type IPatient = {
 }
 
 export type IStaff = {
+    id : number;
     users: IUsers;
     s_id : number,
-    jobID : number,
-    jobs :  Job,
+    job_id : number,
+    jobs :  string,
     username: string;
     firstName: string,
     mInit: string,
@@ -30,7 +32,9 @@ export type IStaff = {
     sex: string,
     password: string,
     staff: string,
+    department_id: number,
     departments: Department,
+    manager_id: number,
     salary: number,
     qualifications: string,
 }
@@ -94,8 +98,11 @@ export type IRegisterProps = {
 export type Staff = {
     s_id: number;
     job_id: number;
+    job: Jobs;
     dept_id: number;
+    department: Department;
     manager_id: number;
+    manager: string;
     qualifications: string;
     salary: number;
     users: IUsers;
