@@ -294,7 +294,7 @@ export default function Profile() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="text-black w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded read-only:bg-gray-100 read-only:cursor-not-allowed read-only:opacity-40"
                     readOnly
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function Profile() {
                     name="salary"
                     value={formData.salary}
                     onChange={handleInputChange}
-                    className="text-black w-full p-2 border border-gray-300 rounded"
+                    className="text-black w-full p-2 border border-gray-300 rounded read-only:bg-gray-100 read-only:cursor-not-allowed read-only:opacity-40"
                     readOnly
                   />
                 </div>

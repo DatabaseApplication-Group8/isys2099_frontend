@@ -102,7 +102,7 @@ export default function Schedule() {
             id="date"
             value={selectedDate}
             onChange={handleDateChange}
-            className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-black p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>

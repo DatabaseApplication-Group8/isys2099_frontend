@@ -41,6 +41,16 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
   const [userId, setUserId] = useState<number>(0);
   const [role, setRole] = useState<number>(0);
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+
   useEffect(() => {
     const fetchLists = async () => {
       try {
@@ -87,6 +97,20 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
     fetchLists();
   }, [formData.s_id]);
+
+  useEffect(() => {
+    // Convert the date to YYYY-MM-DD format
+    if (staff && staff.users) {
+      const formattedDate = new Date(staff.users.birth_date).toISOString().split('T')[0];
+      setFormData(prevData => ({
+        ...prevData,
+        users: {
+          ...prevData.users,
+          birth_date: formattedDate
+        }
+      }));
+    }
+  }, [staff]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -147,9 +171,10 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="username"
                 value={formData.users.username}
-                readOnly
-                className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                disabled
+                className="p-3 border text-black border-gray-300 rounded-md disabled:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
+
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="firstName" className="text-sm font-semibold text-[#1F2B6C]">First Name</label>
@@ -233,7 +258,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="date"
                 id="dob"
                 name="dob"
-                value={formData.users.birth_date}
+                value={formatDate(formData.users.birth_date)}
                 onChange={handleChange}
                 max={today}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -241,34 +266,49 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
-              <select
-                id="job"
-                name="job"
-                value={formData.jobs.job_id}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">Select job</option>
-                {jobList.map((job) => (
-                  <option key={job.job_id} value={job.job_id}>{job.job_title}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="job"
+                  name="job"
+                  value={formData.jobs.job_id}
+                  onChange={handleChange}
+                  className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                >
+                  <option value="">Select job</option>
+                  {jobList.map((job) => (
+                    <option key={job.job_id} value={job.job_id}>{job.job_title}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="manager_id" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
-              <select
-                id="manager_id"
-                name="manager_id"
-                value={formData.manager}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">None</option>
-                {managerList.map((manager) => (
-                  <option key={manager.manager_id} value={manager.manager_id}>{manager.users.username}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="manager_id"
+                  name="manager_id"
+                  value={formData.manager}
+                  onChange={handleChange}
+                  className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                >
+                  <option value="">None</option>
+                  {managerList.map((manager) => (
+                    <option key={manager.manager_id} value={manager.manager_id}>{manager.users.username}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
+
             <div className="flex flex-col space-y-2">
               <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
               <input
@@ -293,18 +333,26 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="department" className="text-sm font-semibold text-[#1F2B6C]">Department</label>
-              <select
-                id="department"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">Select department</option>
-                {departmentList.map((department) => (
-                  <option key={department.dept_id} value={department.dept_id}>{department.dept_name}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
+                >
+                  <option value="">Select department</option>
+                  {departmentList.map((department) => (
+                    <option key={department.dept_id} value={department.dept_id}>{department.dept_name}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+
             </div>
           </div>
           <div className="flex justify-end mt-4 space-x-4">

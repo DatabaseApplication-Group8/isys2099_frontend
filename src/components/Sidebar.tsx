@@ -5,7 +5,7 @@ const Sidebar = () => {
     return (
         <div className="flex flex-col w-full text-white h-screen">
             <Link href="/admin/dashboard">
-                <div className="p-6 text-xl font-semibold">Admin Dashboard</div>
+                <div className="p-6 text-xl font-semibold hover:underline hover:underline-offset-2">Admin Dashboard</div>
             </Link>
 
             <nav className="flex-1">

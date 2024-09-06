@@ -77,20 +77,20 @@ export default function Staff() {
     setNameSortOrder((prevOrder) => (prevOrder === "ASC" ? "DESC" : "ASC"));
   };
 
-  const handleDeleteStaff = (id: number) => {
+  const handleDeleteStaff = async (id: number) => {
     // access token
     const token = localStorage.getItem("accessToken");
+
     if (!token) {
       throw new Error("No access token found.");
       setLoading(false);
       return;
     }
 
-    setStaffList(staffList.filter((s) => s.s_id !== id));
-    setFilteredStaff(filteredStaff.filter((s) => s.s_id !== id));
+    console.log("Staff id:", id)
 
-    const response = axios.delete(
-      `http://localhost:8080/staff/${encodeURIComponent(id)}`,
+    const response = await axios.delete(
+      `http://localhost:8080/staff/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +98,11 @@ export default function Staff() {
       }
     );
 
-    setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
+    if (response) {
+      setStaffList(staffList.filter((s) => s.s_id !== id));
+      setFilteredStaff(filteredStaff.filter((s) => s.s_id !== id));
+      setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
+    }
   };
 
   const handleUpdateClick = (staff: IStaff) => {
