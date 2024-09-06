@@ -66,8 +66,24 @@ export default function Profile() {
   };
 
   const handleViewPatientHistory = async () => {
+    const accessToken = localStorage.getItem("accessToken");
     if (!validateDateRange()) return;
-    await fetchData('/api/patient-treatment-history', { startDate, endDate }, setPatientTreatmentHistory, 'date', 'patientTreatmentHistory');
+    try {
+        const treatment = await axios.post(`http://localhost:8080/treatment/patient/duration`,{
+            p_id: parseInt(user.id),
+            start_date: new Date(startDate),
+            end_date: new Date(endDate)
+        } ,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setTreatments(treatment.data);
+    } catch (error) {
+        console.log(error);
+    }
+
+    // await fetchData('/api/patient-treatment-history', { startDate, endDate }, setPatientTreatmentHistory, 'date', 'patientTreatmentHistory');
   };
 
   const handleLogout = () => {
@@ -196,10 +212,10 @@ export default function Profile() {
               {user.role === 3
                 ? " - Patient"
                 : user.role === 2
-                  ? " - Staff"
-                  : user.role === 1
-                    ? " - Admin"
-                    : "Unknown Role"}
+                ? " - Staff"
+                : user.role === 1
+                ? " - Admin"
+                : "Unknown Role"}
             </p>
           </div>
           <div className="flex justify-end mt-4">
@@ -216,7 +232,6 @@ export default function Profile() {
           <div className="appointment">
             <div className="flex flex-row mb-4 items-center justify-between">
               <h2 className="text-3xl font-semibold text-gray-900">Appointment</h2>
-
             </div>
             <div className="appointment-container bg-white rounded-lg shadow-lg overflow-y-auto">
               <table className="w-full text-left h-72">
@@ -302,14 +317,9 @@ export default function Profile() {
 
         {/* Treatment and Appointment Sections */}
         <div className="lg:w-[50%] flex flex-col gap-6">
-
           <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-2">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
-            {dateRangeError && (
-              <div className="text-red-500 mb-2 text-end">
-                {dateRangeError}
-              </div>
-            )}
+            {dateRangeError && <div className="text-red-500 mb-2 text-end">{dateRangeError}</div>}
             <div className="flex flex-row gap-4">
               <input
                 required
@@ -329,8 +339,10 @@ export default function Profile() {
               />
             </div>
             <div className="flex flex-row actions mt-6 space-x-6 justify-end">
-              <button className="bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
-                onClick={handleViewPatientHistory}>
+              <button
+                className="bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
+                onClick={handleViewPatientHistory}
+              >
                 View Patient Treatment History
               </button>
             </div>
@@ -338,7 +350,6 @@ export default function Profile() {
           <div className="treatment">
             <div className="flex flex-row space-x-4 mb-4 items-center justify-between">
               <h2 className="text-3xl font-semibold text-gray-900">Treatment</h2>
-
             </div>
             <div className="treatment-container bg-white rounded-lg shadow-lg overflow-y-auto">
               <table className="w-full text-left h-72">
@@ -361,6 +372,7 @@ export default function Profile() {
                         <td className="py-2 px-4 border-b text-black">{treatment.end_time.slice(11, 16)}</td>
                         <td className="py-2 px-4 border-b text-black">{treatment.staff.users.Fname}</td>
                         <td className="py-2 px-4 border-b text-black">{treatment.description}</td>
+                        <td className="py-2 px-4 border-b text-red-500">{treatment.billing} $</td>
                       </tr>
                     ))
                   ) : (
@@ -389,8 +401,6 @@ export default function Profile() {
 
           {/*appoinment*/}
         </div>
-
-
       </div>
 
       {isAppointmentModalOpen && currentItemType === "appointment" && (
