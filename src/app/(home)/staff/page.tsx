@@ -138,6 +138,7 @@ export default function Profile() {
       console.log(userId,role);
       console.log(updatedStaff);
       setUpdatedDataFE(updatedStaff);
+      
       await axios.patch(`http://localhost:8080/users/update-staff/${encodeURIComponent(userId)}/${encodeURIComponent(role)}`, {
         Fname: updatedStaff.firstName,
         Minit: updatedStaff.mInit,

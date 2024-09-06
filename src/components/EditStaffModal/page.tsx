@@ -1,25 +1,26 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Department, Jobs } from "@/types/user";
+import { Department, Jobs, Staff } from "@/types/user";
 import { useUserContext } from "@/app/context";
 
-interface Staff {
-  id: string;
-  username: string;
-  firstName: string;
-  mInit: string;
-  lastName: string;
-  phone: string;
-  dob: string;
-  sex: string;
-  email: string;
-  job: string;
-  manager_id: string;
-  qualification: string;
-  salary: number;
-  department: string;
-}
+// interface Staff {
+//   id: string;
+//   username: string;
+//   firstName: string;
+//   mInit: string;
+//   lastName: string;
+//   phone: string;
+//   dob: string;
+//   sex: string;
+//   email: string;
+//   job: string;
+//   manager_id: string;
+//   qualification: string;
+//   salary: number;
+//   departments: string;
+// }
+
 
 interface EditStaffModalProps {
   staff: Staff;
@@ -37,14 +38,20 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
   const [jobList, setJobList] = useState<Jobs[]>([]);
   const [departmentList, setDepartmentList] = useState<Department[]>([]);
   const [today, setToday] = useState<string>("");
+  const [userId, setUserId] = useState<number>(0);
+  const [role, setRole] = useState<number>(0);
 
   useEffect(() => {
     const fetchLists = async () => {
       try {
         const token = localStorage.getItem('accessToken');
+        const user_id = localStorage.getItem('id');
+        const role = localStorage.getItem('role');
+        setUserId(Number(user_id));
+        setRole(Number(role));
         if (!token) throw new Error("No access token found.");
 
-        const user_id = formData.id; // Use appropriate user ID
+        // const user_id = formData.id; // Use appropriate user ID
 
         const [managersResponse, jobsResponse, departmentsResponse] = await Promise.all([
           axios.get<Staff[]>(`http://localhost:8080/staff/list-staff-exclude-current-user/${user_id}`, {
@@ -62,6 +69,9 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               { Authorization: `Bearer ${token}` }
           })
         ]);
+        console.log("Managers: ", managersResponse.data);
+        console.log("Jobs: ", jobsResponse.data);
+        console.log("Departments: ", departmentsResponse.data);
 
         setManagerList(managersResponse.data);
         setJobList(jobsResponse.data);
@@ -76,11 +86,12 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
     };
 
     fetchLists();
-  }, [formData.id]);
+  }, [formData.s_id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
+    console.log("Form data: ", formData);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -89,12 +100,20 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("No token found");
-
-      await axios.put(
-        `http://localhost:8080/staff/profile/${encodeURIComponent(formData.id)}`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.patch(`http://localhost:8080/users/update-staff/${encodeURIComponent(staff.s_id)}/${encodeURIComponent(staff.users.role)}`, {
+        Fname: formData.users.Fname,
+        Minit: formData.users.Minit,
+        Lname: formData.users.Lname,
+        birth_date: new Date(formData.users.birth_date),
+        phone: formData.users.phone,
+        // email: updatedStaff.users.email,
+        salary: formData.salary,
+        qualifications: formData.qualifications
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
       onUpdate(formData);
       setSuccessMessage('Profile updated successfully.');
@@ -127,7 +146,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="username"
-                value={formData.username}
+                value={formData.users.username}
                 readOnly
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -138,7 +157,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="firstName"
                 name="firstName"
-                value={formData.firstName}
+                value={formData.users.Fname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -149,7 +168,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="mInit"
                 name="mInit"
-                value={formData.mInit}
+                value={formData.users.Minit}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -160,7 +179,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="lastName"
                 name="lastName"
-                value={formData.lastName}
+                value={formData.users.Lname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -171,7 +190,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 <select
                   id="sex"
                   name="sex"
-                  value={formData.sex}
+                  value={formData.users.sex}
                   onChange={handleChange}
                   className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
@@ -192,7 +211,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="phone"
                 name="phone"
-                value={formData.phone}
+                value={formData.users.phone}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -203,7 +222,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
+                value={formData.users.email}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -214,7 +233,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="date"
                 id="dob"
                 name="dob"
-                value={formData.dob}
+                value={formData.users.birth_date}
                 onChange={handleChange}
                 max={today}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -225,13 +244,13 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <select
                 id="job"
                 name="job"
-                value={formData.job}
+                value={formData.jobs.job_id}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               >
                 <option value="">Select job</option>
                 {jobList.map((job) => (
-                  <option key={job.id} value={job.id}>{job.name}</option>
+                  <option key={job.job_id} value={job.job_id}>{job.job_title}</option>
                 ))}
               </select>
             </div>
@@ -240,13 +259,13 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <select
                 id="manager_id"
                 name="manager_id"
-                value={formData.manager_id}
+                value={formData.manager}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               >
                 <option value="">None</option>
                 {managerList.map((manager) => (
-                  <option key={manager.id} value={manager.id}>{manager.username}</option>
+                  <option key={manager.manager_id} value={manager.manager_id}>{manager.users.username}</option>
                 ))}
               </select>
             </div>
@@ -256,7 +275,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="qualification"
                 name="qualification"
-                value={formData.qualification}
+                value={formData.qualifications}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -283,7 +302,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               >
                 <option value="">Select department</option>
                 {departmentList.map((department) => (
-                  <option key={department.id} value={department.id}>{department.name}</option>
+                  <option key={department.dept_id} value={department.dept_id}>{department.dept_name}</option>
                 ))}
               </select>
             </div>

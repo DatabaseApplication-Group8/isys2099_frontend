@@ -108,6 +108,18 @@ export default function AdminDashboard() {
     const handleViewAllPatientTreatments = async () => {
         if (!validateDateRange()) return;
         await fetchData('/api/all-patient-treatments', { startDate, endDate }, setAllPatientTreatments, 'date', 'allPatientTreatments');
+
+        const response = await axios.get(
+            `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+        console.log(response.data);
+        setAllPatientTreatments(response.data);
+
     };
 
     const handleViewDoctorWork = async () => {
@@ -221,7 +233,7 @@ export default function AdminDashboard() {
                     <div className="text-black">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">All Patient Treatments</h2>
                         <Table
-                            columns={['ID', 'Date', 'Time', 'Doctor', 'Status']}
+                            columns={['Treatment Id', 'Patient Id', 'Doctor Id', 'Description', 'Treatment Date', 'Start Time', "End Time", 'Billing']}
                             data={allPatientTreatments.map((treatment) => ({
                                 ...treatment,
                                 status: <span className={getStatusClass(treatment.status)}>{treatment.status}</span>,
