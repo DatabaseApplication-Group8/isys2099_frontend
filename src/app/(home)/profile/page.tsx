@@ -66,8 +66,24 @@ export default function Profile() {
   };
 
   const handleViewPatientHistory = async () => {
+    const accessToken = localStorage.getItem("accessToken");
     if (!validateDateRange()) return;
-    await fetchData('/api/patient-treatment-history', { startDate, endDate }, setPatientTreatmentHistory, 'date', 'patientTreatmentHistory');
+    try {
+        const treatment = await axios.post(`http://localhost:8080/treatment/patient/duration`,{
+            p_id: parseInt(user.id),
+            start_date: new Date(startDate),
+            end_date: new Date(endDate)
+        } ,{
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setTreatments(treatment.data);
+    } catch (error) {
+        console.log(error);
+    }
+
+    // await fetchData('/api/patient-treatment-history', { startDate, endDate }, setPatientTreatmentHistory, 'date', 'patientTreatmentHistory');
   };
 
   const handleLogout = () => {
