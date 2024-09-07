@@ -34,6 +34,13 @@ export default function Schedule() {
     setShowUpdateForm(true);
   };
 
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '';
+    const date = new Date(timeString);
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+};
   useEffect(() => {
     if (selectedDate) {
       // Mock data for testing
@@ -140,8 +147,8 @@ export default function Schedule() {
                         key={index}
                         className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                       >
-                        <td className="text-black py-3 px-4 border-b border-gray-300">{item.startTime}</td>
-                        <td className="text-black py-3 px-4 border-b border-gray-300">{item.endTime}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
                         <td className="text-black py-2 px-4 border-b">
                           <button

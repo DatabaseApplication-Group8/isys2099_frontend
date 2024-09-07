@@ -37,6 +37,23 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
     maxDate: "",
   });
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '';
+    const date = new Date(timeString);
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
@@ -77,30 +94,53 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
     });
   }, []);
 
+  useEffect(() => {
+    // Convert the date to YYYY-MM-DD format
+    if (schedule) {
+      const formattedDate = new Date(schedule.schedule_date).toISOString().split('T')[0];
+      setFormData(prevData => ({
+        ...prevData,
+        schedule: {
+          ...prevData.schedule,
+          schedule_date: formattedDate
+        }
+      }));
+    }
+  }, [schedule]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
+
     setFormData((prevData) => {
       const newData = { ...prevData, [id]: value };
 
-      if (id === "scheduled_date") {
-        const selectedDate = new Date(value);
-        const today = new Date();
-        if (selectedDate.toDateString() === today.toDateString()) {
-          const minTime = today.toTimeString().slice(0, 5);
-          setTimeConstraints((prev) => ({ ...prev, minTime }));
-        } else {
-          setTimeConstraints((prev) => ({ ...prev, minTime: "" }));
-        }
-      }
-
-      if (id === "startTime") {
+      if (id === "startTime" && newData.date) {
         const startTime = new Date(`${newData.date}T${value}`);
-        const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000)
+        // Ensure that endTime is always later than startTime
+        const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000) // Add 2 hours
           .toISOString()
           .split("T")[1]
           .slice(0, 5);
 
-        return { ...newData, endTime: newData.endTime <= value ? "" : newData.endTime, maxEndTime };
+        return {
+          ...newData,
+          endTime: newData.endTime && new Date(`${newData.date}T${newData.endTime}`) <= startTime
+            ? "" // Clear endTime if it's not valid
+            : newData.endTime,
+          maxEndTime,
+        };
+      }
+
+      if (id === "endTime" && newData.date) {
+        const startTime = new Date(`${newData.date}T${newData.startTime}`);
+        const endTime = new Date(`${newData.date}T${value}`);
+
+        // Ensure that endTime is always later than startTime
+        if (endTime <= startTime) {
+          setErrorMessage("End time must be after start time.");
+        } else {
+          setErrorMessage("");
+        }
       }
 
       return newData;
@@ -111,11 +151,12 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
     event.preventDefault();
     setLoading(true);
 
-    const startTime = new Date(`${formData.date}T${formData.startTime}`);
-    const endTime = new Date(`${formData.date}T${formData.endTime}`);
+    const startTime = new Date(`${formData.scheduled_date}T${formData.startTime}`);
+    const endTime = new Date(`${formData.scheduled_date}T${formData.endTime}`);
 
     if (endTime <= startTime) {
-      alert("End time must be after start time.");
+      setErrorMessage("End time must be after start time.");
+      setLoading(false);
       return;
     }
 
@@ -124,9 +165,9 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
       if (!token) throw new Error("No token found");
 
       await axios.post(
-        `http://localhost:8080/staff/schedule/${encodeURIComponent(schedule.id)}`, // Use schedule.id
+        `http://localhost:8080/staff/schedule/${encodeURIComponent(schedule.scheduled_id)}`,
         {
-          date: formData.scheduled_date,
+          date: new Date(formData.scheduled_date),
           startTime: formData.startTime,
           endTime: formData.endTime,
           description: formData.description,
@@ -134,16 +175,15 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      onUpdate(formData); // Call the update function
-      setSuccessMessage("Schedule updated successfully.");
+      setSuccessMessage("Schedule created successfully.");
       setTimeout(() => {
         setSuccessMessage("");
         onClose();
       }, 3000);
     } catch (error: any) {
       const errorDetail = error.response?.data?.message || error.message;
-      setErrorMessage(`Failed to update schedule: ${errorDetail}`);
-  } finally {
+      setErrorMessage(`Failed to create schedule: ${errorDetail}`);
+    } finally {
       setLoading(false);
     }
   };
@@ -161,8 +201,8 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
               <input
                 required
                 type="date"
-                id="date"
-                value={formData.scheduled_date}
+                id="scheduled_date"
+                value={formatDate(formData.scheduled_date)}
                 onChange={handleChange}
                 min={dateConstraints.minDate}
                 max={dateConstraints.maxDate}

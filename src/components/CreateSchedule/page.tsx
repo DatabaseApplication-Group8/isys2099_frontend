@@ -80,42 +80,39 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ schedule, onClose, onUp
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
+    
         setFormData((prevData) => {
             const newData = { ...prevData, [id]: value };
-
-            if (id === "scheduled_date") {
-                const selectedDate = new Date(value);
-                const today = new Date();
-
-                if (selectedDate.toDateString() === today.toDateString()) {
-                    const now = new Date();
-                    const minTime = now.toTimeString().split(" ")[0].slice(0, 5);
-                    setTimeConstraints((prevConstraints) => ({
-                        ...prevConstraints,
-                        minTime,
-                    }));
-                } else {
-                    setTimeConstraints((prevConstraints) => ({
-                        ...prevConstraints,
-                        minTime: "", // No minTime constraint for future dates
-                    }));
-                }
-            }
-
-            if (id === "startTime") {
+    
+            if (id === "startTime" && newData.date) {
                 const startTime = new Date(`${newData.date}T${value}`);
+                // Ensure that endTime is always later than startTime
                 const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000) // Add 2 hours
                     .toISOString()
                     .split("T")[1]
                     .slice(0, 5);
-
+    
                 return {
                     ...newData,
-                    endTime: newData.endTime <= value ? "" : newData.endTime,
+                    endTime: newData.endTime && new Date(`${newData.date}T${newData.endTime}`) <= startTime
+                        ? "" // Clear endTime if it's not valid
+                        : newData.endTime,
                     maxEndTime,
                 };
             }
-
+    
+            if (id === "endTime" && newData.date) {
+                const startTime = new Date(`${newData.date}T${newData.startTime}`);
+                const endTime = new Date(`${newData.date}T${value}`);
+    
+                // Ensure that endTime is always later than startTime
+                if (endTime <= startTime) {
+                    setErrorMessage("End time must be after start time.");
+                } else {
+                    setErrorMessage("");
+                }
+            }
+    
             return newData;
         });
     };
@@ -123,28 +120,31 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({ schedule, onClose, onUp
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setLoading(true);
-
-        const startTime = new Date(`${formData.date}T${formData.startTime}`);
-        const endTime = new Date(`${formData.date}T${formData.endTime}`);
-
+    
+        const startTime = new Date(`${formData.scheduled_date}T${formData.startTime}`);
+        const endTime = new Date(`${formData.scheduled_date}T${formData.endTime}`);
+    
         if (endTime <= startTime) {
-            alert("End time must be after start time.");
+            setErrorMessage("End time must be after start time.");
+            setLoading(false);
             return;
         }
+    
         try {
             const token = localStorage.getItem("accessToken");
             if (!token) throw new Error("No token found");
-
-            const response= await axios.post(
+    
+            await axios.post(
                 `http://localhost:8080/staff/schedule/${encodeURIComponent(schedule.scheduled_id)}`,
-                {   date: formData.scheduled_date,
+                {
+                    date: formData.scheduled_date,
                     startTime: formData.startTime,
                     endTime: formData.endTime,
                     description: formData.description,
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log("Form submitted with data:", formData);
+    
             setSuccessMessage("Schedule created successfully.");
             setTimeout(() => {
                 setSuccessMessage("");
