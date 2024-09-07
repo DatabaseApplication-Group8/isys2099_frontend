@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 interface Schedule {
-  id: string;
-  date: string;
+  scheduled_id: string;
+  scheduled_date: string;
   startTime: string;
   endTime: string;
   description: string;
@@ -21,7 +21,10 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
-    ...schedule, // Initialize with schedule data
+    scheduled_date: "",
+    startTime: "",
+    endTime: "",
+    description: "",
   });
 
   const [timeConstraints, setTimeConstraints] = useState({
@@ -29,12 +32,57 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
     maxEndTime: "",
   });
 
+  const [dateConstraints, setDateConstraints] = useState({
+    minDate: "",
+    maxDate: "",
+  });
+
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          setLoading(false);
+          throw new Error("No access token found.");
+        }
+
+        const scheduled_id = parseInt(localStorage.getItem("scheduled_id") ?? "");
+        console.log(scheduled_id);
+        // Fetch schedule logic here
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchSchedule();
+
+    const today = new Date();
+    const minDate = today.toISOString().split("T")[0];
+
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 14);
+    const maxDateString = maxDate.toISOString().split("T")[0];
+
+    setDateConstraints({
+      minDate,
+      maxDate: maxDateString,
+    });
+
+    const now = new Date();
+    const minTime = now.toTimeString().split(" ")[0].slice(0, 5);
+
+    setTimeConstraints({
+      minTime,
+      maxEndTime: "", // Initial empty maxEndTime
+    });
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData((prevData) => {
       const newData = { ...prevData, [id]: value };
 
-      if (id === "date") {
+      if (id === "scheduled_date") {
         const selectedDate = new Date(value);
         const today = new Date();
         if (selectedDate.toDateString() === today.toDateString()) {
@@ -63,13 +111,26 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
     event.preventDefault();
     setLoading(true);
 
+    const startTime = new Date(`${formData.date}T${formData.startTime}`);
+    const endTime = new Date(`${formData.date}T${formData.endTime}`);
+
+    if (endTime <= startTime) {
+      alert("End time must be after start time.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error("No token found");
 
       await axios.post(
         `http://localhost:8080/staff/schedule/${encodeURIComponent(schedule.id)}`, // Use schedule.id
-        formData,
+        {
+          date: formData.scheduled_date,
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          description: formData.description,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -79,9 +140,10 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
         setSuccessMessage("");
         onClose();
       }, 3000);
-    } catch (error) {
-      setErrorMessage("Failed to update schedule.");
-    } finally {
+    } catch (error: any) {
+      const errorDetail = error.response?.data?.message || error.message;
+      setErrorMessage(`Failed to update schedule: ${errorDetail}`);
+  } finally {
       setLoading(false);
     }
   };
@@ -100,14 +162,16 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
                 required
                 type="date"
                 id="date"
-                value={formData.date}
+                value={formData.scheduled_date}
                 onChange={handleChange}
+                min={dateConstraints.minDate}
+                max={dateConstraints.maxDate}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="startTime" className="text-sm font-semibold text-[#1F2B6C]">
-                Start time
+                Start time <span className="text-red-500">*</span>
               </label>
               <input
                 required
@@ -156,7 +220,7 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
           )}
 
           <div className="flex justify-end mt-4 space-x-4">
-          <button
+            <button
               type="button"
               onClick={onClose}
               className="h-11 w-[155px] border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -170,7 +234,7 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({ schedule, onClose, onUp
             >
               {loading ? "Updating..." : "Update Schedule"}
             </button>
-            
+
           </div>
         </form>
 
