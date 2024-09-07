@@ -22,16 +22,16 @@ export type IStaff = {
     s_id : number,
     job_id : number,
     jobs :  string,
-    username: string;
-    firstName: string,
-    mInit: string,
-    lastName: string,
-    phone: string,
-    email: string,
-    dob: string,
-    sex: string,
-    password: string,
-    staff: string,
+    // username: string;
+    // firstName: string,
+    // mInit: string,
+    // lastName: string,
+    // phone: string,
+    // email: string,
+    // dob: string,
+    // sex: string,
+    // password: string,
+    // staff: string,
     department_id: number,
     departments: Department,
     manager_id: number,
@@ -108,6 +108,26 @@ export type Staff = {
     users: IUsers;
 }
 
+
+export type updatedStaff = {
+    s_id: number;
+    job_id: number;
+    job: Jobs;
+    dept_id: number;
+    department: Department;
+    manager_id: number;
+    manager: string;
+    qualifications: string;
+    sex: string;
+    salary: number;
+    firstName: string;
+    mInit: string;
+    lastName: string;
+    phone: string;
+    dob : string;
+    email: string;
+}
+
 export type updateStaffDto = {
     firstName: string;
     mInit: string;
@@ -122,3 +142,38 @@ export type Jobs = {
     job_title: string;
     job_description: string;   
 }
+
+export type Appointment = {
+    appointment_id: number;
+    meeting_date: string;
+    p_id: number;
+    s_id: number;
+    purpose: string;
+    location: string;
+    start_time: string;
+    end_time: string;
+    meeting_status: string;
+}
+
+export type Treatment =  {
+    t_id: number;
+    p_id: number;
+    doctor_id: number;
+    treatment_date: string;
+    start_time: string;
+    end_time: string;
+    patientName: string;
+    description : string;
+    billing: number;
+  }
+
+
+export type PersonalScheduleItem =  {
+    start_time: string;
+    end_time: string;
+    activity: string;
+    description: string;
+  }
+
+
+  

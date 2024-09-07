@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Department, Jobs, Staff } from "@/types/user";
+import { Department, IStaff, Jobs, Staff, updatedStaff, updateStaffDto } from "@/types/user";
 import { useUserContext } from "@/app/context";
 
 // interface Staff {
@@ -90,6 +90,9 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    // name = firstName
+    
+
     setFormData(prevData => ({ ...prevData, [name]: value }));
     console.log("Form data: ", formData);
   };
@@ -97,6 +100,8 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+
+    console.log("Final form: ", formData)
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("No token found");
@@ -157,7 +162,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="firstName"
                 name="firstName"
-                value={formData.users.Fname}
+                defaultValue={formData.users.Fname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -168,7 +173,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="mInit"
                 name="mInit"
-                value={formData.users.Minit}
+                defaultValue={formData.users.Minit}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -179,7 +184,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="lastName"
                 name="lastName"
-                value={formData.users.Lname}
+                defaultValue={formData.users.Lname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -190,7 +195,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 <select
                   id="sex"
                   name="sex"
-                  value={formData.users.sex}
+                  defaultValue={formData.users.sex}
                   onChange={handleChange}
                   className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
@@ -211,7 +216,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 type="text"
                 id="phone"
                 name="phone"
-                value={formData.users.phone}
+                defaultValue={formData.users.phone}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -223,6 +228,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 id="email"
                 name="email"
                 value={formData.users.email}
+                readOnly
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />
@@ -273,9 +279,9 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <label htmlFor="qualification" className="text-sm font-semibold text-[#1F2B6C]">Qualification</label>
               <input
                 type="text"
-                id="qualification"
-                name="qualification"
-                value={formData.qualifications}
+                id="qualifications"
+                name="qualifications"
+                defaultValue={formData.qualifications}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               />

@@ -36,6 +36,7 @@ export default function Staff() {
         setTimeout(() => {
           setSuccessMessage("");
         }, 5000);
+
       } catch (error) {
         console.error("Error fetching data:", error);
         setErrorMessage("Failed to load staff data.");
@@ -102,6 +103,7 @@ export default function Staff() {
   };
 
   const handleUpdateClick = (staff: IStaff) => {
+    console.log("Updated Staff Data: ", staff)
     setStaffToUpdate(staff);
     setShowUpdateForm(true);
   };
