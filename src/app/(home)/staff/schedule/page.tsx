@@ -1,7 +1,14 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import UpdateSchedule from '@/components/UpdateSchedule/page';
+
+import React, { useState, useEffect, use } from "react";
+import UpdateSchedule from "@/components/UpdateSchedule/page";
+import axios from "axios";
+import { Appointment, PersonalScheduleItem, Treatment } from "@/types/user";
+import { set } from "react-datepicker/dist/date_utils";
+
+
 import CreateSchedule from '@/components/CreateSchedule/page';
+
 
 // Define types for your schedule data
 interface ScheduleItem {
@@ -12,22 +19,23 @@ interface ScheduleItem {
   description: string;
 }
 
-interface PersonalScheduleItem {
-  startTime: string;
-  endTime: string;
-  activity: string;
-  description: string;
-}
-
 export default function Schedule() {
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
-  const [personalSchedule, setPersonalSchedule] = useState<PersonalScheduleItem[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [personalSchedule, setPersonalSchedule] = useState<
+    PersonalScheduleItem[]
+  >([]);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
+
+  const [treatments, setTreatment] = useState<Treatment[]>([]);
+  const [appointments, setAppointment] = useState<Appointment[]>([]);
+  const [userId, setUserId] = useState<number>(0);
+
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [scheduleToUpdate, setScheduleToUpdate] = useState<PersonalScheduleItem | null>(null);
+
 
   const handleUpdateClick = (schedule: PersonalScheduleItem) => {
     setScheduleToUpdate(schedule);
@@ -42,58 +50,67 @@ export default function Schedule() {
     return `${hours}:${minutes}`;
 };
   useEffect(() => {
-    if (selectedDate) {
-      // Mock data for testing
-      const mockData: ScheduleItem[] = [
-        {
-          startTime: '09:00 AM',
-          endTime: '10:00 AM',
-          patientName: 'John Doe',
-          type: 'Check-up',
-          description: 'Routine check-up',
-        },
-        {
-          startTime: '10:30 AM',
-          endTime: '11:30 AM',
-          patientName: 'Jane Smith',
-          type: 'Consultation',
-          description: 'Consultation for routine symptoms.',
-        },
-        {
-          startTime: '01:00 PM',
-          endTime: '02:00 PM',
-          patientName: 'Emily Johnson',
-          type: 'Follow-up',
-          description: 'Follow-up on recent surgery.',
-        },
-        {
-          startTime: '02:30 PM',
-          endTime: '03:30 PM',
-          patientName: 'Michael Brown',
-          type: 'Check-up',
-          description: 'Routine check-up',
-        },
-      ];
-      setSchedule(mockData);
 
-      // Mock personal schedule data for testing
-      const mockPersonalSchedule: PersonalScheduleItem[] = [
-        {
-          startTime: '11:00 AM',
-          endTime: '12:00 PM',
-          activity: 'Going out for lunch',
-          description: 'Lunch break',
-        },
-        {
-          startTime: '03:30 PM',
-          endTime: '04:30 PM',
-          activity: 'Meeting with team',
-          description: 'Discuss project progress',
-        },
-      ];
-      setPersonalSchedule(mockPersonalSchedule);
+    console.log("Updated appointment state: ", appointments);
+  }, [appointments, treatments]);  // This will log every time `appointment` changes.
+
+  useEffect(() => {
+    console.log("Updated treatment state: ", treatments);
+  } , [treatments]);  // This will log only once when the component mounts.
+  
+  const fetchData = async () => {
+    try {
+      const id = localStorage.getItem("id");
+      setUserId(Number(id));
+      console.log("User ID: ", id);
+      if (selectedDate) {
+        const response = await axios.get(
+          `http://localhost:8080/appointment/by-date-range/${encodeURIComponent(userId)}/:${encodeURIComponent(selectedDate)}`,  // Removed the colon ':' before the variable part of the URL
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        setAppointment(response.data);
+        // console.log("Treatment data fetched: ", response.data);
+        console.log("Updated appointment state: ", appointments);
+
+        const treatments = await axios.get(
+          `http://localhost:8080/treatment/by-treatment-date/${encodeURIComponent(userId)}/:${encodeURIComponent(selectedDate)}`,  // Removed the colon ':' before the variable part of the URL
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+
+        setTreatment(treatments.data);
+        console.log("Treatment data fetched: ", treatments.data);
+
+
+        const personalSchedule = await axios.get(
+          `http://localhost:8080/staff/view-staff-schedule-by-date/${encodeURIComponent(1)}/:${encodeURIComponent(selectedDate)}`,  // Removed the colon ':' before the variable part of the URL
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+
+        setPersonalSchedule(personalSchedule.data);
+
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Failed to load schedule data.");
+
     }
-  }, [selectedDate]);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [selectedDate]); // This e
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedDate(e.target.value);
@@ -108,15 +125,22 @@ export default function Schedule() {
     setShowCreateForm(true);
   };
 
-  const appointments = schedule.filter(item => item.type === 'Consultation' || item.type === 'Follow-up');
-  const treatments = schedule.filter(item => item.type === 'Check-up');
+  const filteredAppointments = appointments.filter(
+    (item) => item.purpose === "Consultation" || item.purpose === "Follow-up"
+  );
+
+  const filterTreatments = treatments.filter((item) => item.description === "Check-up");
 
   return (
     <div className="schedule p-8 bg-[#E6F0FF] min-h-screen">
       <div className="flex flex-row justify-between">
-        <h1 className="text-3xl font-semibold mb-6 text-gray-900">Staff Schedule</h1>
+        <h1 className="text-3xl font-semibold mb-6 text-gray-900">
+          Staff Schedule
+        </h1>
         <div className="mb-6 flex items-center space-x-4">
-          <label htmlFor="date" className="text-lg font-medium text-gray-700">Select Date:</label>
+          <label htmlFor="date" className="text-lg font-medium text-gray-700">
+            Select Date:
+          </label>
           <input
             type="date"
             id="date"
@@ -130,14 +154,28 @@ export default function Schedule() {
         <div className="w-[40%]">
           <div className="mb-6">
             <div className="bg-white rounded-lg shadow-lg p-4 h-[450px] overflow-y-auto">
-              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">Personal Schedule on {selectedDate}</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">
+                Personal Schedule on {selectedDate}
+              </h2>
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
-                    <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
+
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Start Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      End Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Description
+                    </th>
+
+<!--                     <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
                     <th className="py-3 px-4 border-b border-gray-300">End Time</th>
                     <th className="py-3 px-4 border-b border-gray-300">Description</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Actions</th>
+                    <th className="py-3 px-4 border-b border-gray-300">Actions</th> -->
+
                   </tr>
                 </thead>
                 <tbody>
@@ -145,9 +183,21 @@ export default function Schedule() {
                     personalSchedule.map((item, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                        className={`hover:bg-gray-100 transition-colors ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
                       >
-                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
+
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {item.start_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {item.end_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {item.description}
+
+<!--                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
                         <td className="text-black py-2 px-4 border-b">
@@ -156,13 +206,19 @@ export default function Schedule() {
                             className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:bg-blue-900"
                           >
                             Edit
-                          </button>
+                          </button> -->
+
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="py-4 text-center text-gray-500">No personal schedule for this date.</td>
+
+                      <td
+                       colSpan="4" className="py-4 text-center text-gray-500"
+                      >
+                        No personal schedule for this date.
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -199,14 +255,24 @@ export default function Schedule() {
           {/* Treatments Section */}
           <div className="grid grid-rows-1 lg:grid-rows-2 gap-6">
             <div className="bg-white rounded-lg shadow-lg p-4 h-[300px] overflow-y-auto">
-              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">Treatments on {selectedDate}</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">
+                Treatments on {selectedDate}
+              </h2>
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
-                    <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">End Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Patient</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Description</th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Start Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      End Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Patient
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Description
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,17 +280,32 @@ export default function Schedule() {
                     treatments.map((treatment, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                        className={`hover:bg-gray-100 transition-colors ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
                       >
-                        <td className="py-3 px-4 border-b border-gray-300">{treatment.startTime}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{treatment.endTime}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{treatment.patientName}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{treatment.description}</td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {treatment.start_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {treatment.end_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {treatment.p_id}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {treatment.description}
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="py-4 text-center text-gray-500">No treatments for this date.</td>
+                      <td
+                        colSpan="4"
+                        className="py-4 text-center text-gray-500"
+                      >
+                        No treatments for this date.
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -233,14 +314,24 @@ export default function Schedule() {
 
             {/* Appointments Section */}
             <div className="bg-white rounded-lg shadow-lg p-4 h-[300px] overflow-y-auto">
-              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">Appointments on {selectedDate}</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">
+                Appointments on {selectedDate}
+              </h2>
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
-                    <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">End Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Patient</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Description</th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Start Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      End Time
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Patient
+                    </th>
+                    <th className="py-3 px-4 border-b border-gray-300">
+                      Description
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -248,17 +339,32 @@ export default function Schedule() {
                     appointments.map((appointment, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
+                        className={`hover:bg-gray-100 transition-colors ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
                       >
-                        <td className="py-3 px-4 border-b border-gray-300">{appointment.startTime}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{appointment.endTime}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{appointment.patientName}</td>
-                        <td className="py-3 px-4 border-b border-gray-300">{appointment.description}</td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {appointment.start_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {appointment.end_time}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {appointment.p_id}
+                        </td>
+                        <td className="py-3 px-4 border-b border-gray-300">
+                          {appointment.purpose}
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="py-4 text-center text-gray-500">No appointments for this date.</td>
+                      <td
+                        colSpan="4"
+                        className="py-4 text-center text-gray-500"
+                      >
+                        No appointments for this date.
+                      </td>
                     </tr>
                   )}
                 </tbody>
