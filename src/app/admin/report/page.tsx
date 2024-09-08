@@ -124,13 +124,13 @@ export default function AdminDashboard() {
 
   const handleViewDoctorWork = async () => {
     if (!validateDateRange()) return;
-    await fetchData(
-      "/api/doctor-work",
-      { startDate, endDate },
-      setDoctorWork,
-      "treatmentDate",
-      "doctorWork"
-    );
+    // await fetchData(
+    //   "/api/doctor-work",
+    //   { startDate, endDate },
+    //   setDoctorWork,
+    //   "treatmentDate",
+    //   "doctorWork"
+    // );
     const response = await axios.get(
       `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
       {
@@ -141,6 +141,7 @@ export default function AdminDashboard() {
     );
     console.log(response.data);
     setDoctorWork(response.data);
+    console.log(doctorWork.length);
   };
 
 
@@ -246,7 +247,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {dataFetched.doctorWork && doctorWork.length === 0 && (
+        {doctorWork && doctorWork.length === 0 && (
           <div className="text-gray-500 mb-6 text-center">
             No doctor work records found for the selected date range.
           </div>
@@ -326,8 +327,8 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
               Doctor Work Report
             </h2>
-            {/* 
-            <Table
+            
+            {/* <Table
               columns={[
                 "Doctor ID",
                 "Patient ID",
@@ -340,7 +341,7 @@ export default function AdminDashboard() {
                 TreatmentDate: treatment.treatment_date, // Display the date of the treatment
                 TreatmentID: treatment.t_id, // Assuming 't_id' is the correct attribute from your backend
               }))}
-            />*/}
+            /> */}
             <table className="bg-white rounded-md text-left w-full">
               <thead className="bg-[#1F2B6C] text-white">
                 <tr>
