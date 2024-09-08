@@ -123,8 +123,8 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
         };
       }
     });
-  
-    console.log("Form data birth_date: ", formData.users.birth_date); // Note: This log may not immediately reflect changes due to the async nature of `setFormData`
+    console.log("Form data: ", formData);
+    // console.log("Form data birth_date: ", formData.users.birth_date); // Note: This log may not immediately reflect changes due to the async nature of `setFormData`
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -135,13 +135,19 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("No token found");
+      console.log("formData job: ", formData.job);
       await axios.patch(`http://localhost:8080/users/update-staff/${encodeURIComponent(staff.s_id)}/${encodeURIComponent(staff.users.role)}`, {
         Fname: formData.Fname,
         Minit: formData.users.Minit,
         Lname: formData.users.Lname,
         birth_date: new Date(formData.users.birth_date),
         phone: formData.users.phone,
-        job: formData.jobs.job_id,
+        job_id: parseInt(formData.job_id),
+        manager_id: parseInt(formData.manager_id),
+        dept_id : parseInt(formData.departments.dept_id),
+
+        // manager_id: formData.manager,
+        // dept_id : formData.departments.dept_id,
         // email: updatedStaff.users.email,
         salary: formData.salary,
         qualifications: formData.qualifications
@@ -154,8 +160,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
       onUpdate(formData);
       setSuccessMessage('Profile updated successfully.');
 
-
-      await axios.post(`http://localhost:8080/jobs/add-new-jobs-history`, {
+      await axios.post(`http://localhost:8080/jobs/add-new-jobs-history/`, {
         job_id: parseInt(formData.jobs.job_id),
         s_id: staff.s_id,
       }, {
@@ -289,11 +294,11 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               />
             </div>
             <div className="flex flex-col space-y-2">
-              <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
+              <label htmlFor="job_id" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
               <select
-                id="job"
-                name="jobs.job_id"
-                value={formData.jobs.job_id}
+                id="job_id"
+                name="job_id"
+                value={parseInt(formData.job_id)}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               >

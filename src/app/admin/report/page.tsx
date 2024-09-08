@@ -170,9 +170,17 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await axios.get("/api/job-change-history", {
-        params: { staffId },
-      });
+      const response = await axios.get(
+        `http://localhost:8080/jobs/find-jobs-history-by-s_id/${staffId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      setJobChangeHistory(response.data);
+
       setJobChangeHistory(response.data);
       setErrorMessage(null);
       setDataFetched((prev) => ({ ...prev, jobChangeHistory: true }));
@@ -344,6 +352,22 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* {jobChangeHistory.length > 0 && (
+          <div className="text-black">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+              Job Change History
+            </h2>
+            <Table
+              columns={["Staff ID", "Change Date", "Previous Role", "New Role"]}
+              data={jobChangeHistory.map((jobChange) => ({
+                    staffId: jobChange.s_id,
+                    changeDate: jobChange.start_date,
+                    previousRole: jobChange.jobs.job_title,
+              }))
+              }
+            />
+          </div>
+        )} */}
         {jobChangeHistory.length > 0 && (
           <div className="text-black">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -351,7 +375,26 @@ export default function AdminDashboard() {
             </h2>
             <Table
               columns={["Staff ID", "Change Date", "Previous Role", "New Role"]}
-              data={jobChangeHistory}
+              data={jobChangeHistory
+                // Sort by start_date to ensure the order is correct for processing
+                .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+                // Reduce the array to pairs of job history entries
+                .reduce((acc, curr, index, src) => {
+                  if (index > 0) {
+                    // Skip the first entry because it can't form a pair with a previous one
+                    const prev = src[index - 1];
+                    if (prev.s_id === curr.s_id) {
+                      // Ensure it's the same staff
+                      acc.push({
+                        staffId: curr.s_id,
+                        changeDate: curr.start_date, // Date of the current entry
+                        previousRole: prev.jobs.job_title, // Role from the previous entry
+                        newRole: curr.jobs.job_title, // Role from the current entry
+                      });
+                    }
+                  }
+                  return acc;
+                }, [])}
             />
           </div>
         )}
