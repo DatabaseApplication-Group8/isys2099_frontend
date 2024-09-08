@@ -90,7 +90,7 @@ export default function Schedule() {
 
 
         const personalSchedule = await axios.get(
-          `http://localhost:8080/staff/view-staff-schedule-by-date/${encodeURIComponent(1)}/:${encodeURIComponent(selectedDate)}`,  // Removed the colon ':' before the variable part of the URL
+          `http://localhost:8080/staff/view-staff-schedule-by-date/${encodeURIComponent(userId)}/:${encodeURIComponent(selectedDate)}`,  // Removed the colon ':' before the variable part of the URL
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

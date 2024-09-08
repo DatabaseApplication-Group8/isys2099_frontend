@@ -247,7 +247,7 @@ const UpdateSchedule: React.FC<UpdateScheduleProps> = ({
       }, 3000);
     } catch (error: any) {
       const errorDetail = error.response?.data?.message || error.message;
-      setErrorMessage(`Failed to create schedule: ${errorDetail}`);
+      setErrorMessage(`Failed to update schedule: ${errorDetail}`);
     } finally {
       setLoading(false);
     }
