@@ -152,6 +152,23 @@ export default function AddStaff() {
           },
         }
       );
+
+      const newStaffId = response.data.id;
+      console.log("New staff ID: ", newStaffId);
+
+  
+      // Create new job history
+      await axios.post(`http://localhost:8080/jobs/add-new-jobs-history`, {
+        job_id: parseInt(formData.job),
+        s_id: newStaffId,
+        start_date: new Date(), // Current date
+        job_status: 1, // Active status
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       setSuccessMessage("You have successfully created new staff!");
 
       setTimeout(() => {

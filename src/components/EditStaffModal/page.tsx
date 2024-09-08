@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Department, IStaff, Jobs, Staff, updatedStaff, updateStaffDto } from "@/types/user";
 import { useUserContext } from "@/app/context";
+import { start } from "repl";
 
 // interface Staff {
 //   id: string;
@@ -88,13 +89,42 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
     fetchLists();
   }, [formData.s_id]);
 
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  //   const { name, value } = e.target;
+  //   // name = firstName
+
+
+  //   setFormData(prevData => ({ ...prevData, [name]: value }));
+  //   console.log("Form data: ", formData);
+  // };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    // name = firstName
-    
-
-    setFormData(prevData => ({ ...prevData, [name]: value }));
-    console.log("Form data: ", formData);
+  
+    // Assuming that your form elements' names are prefixed by their nesting level, separated by a dot, e.g., "users.firstName"
+    const nameParts = name.split('.');
+  
+    setFormData(prevData => {
+      // Handle nested properties like 'users.firstName'
+      if (nameParts.length > 1) {
+        const [mainKey, subKey] = nameParts;
+        return {
+          ...prevData,
+          [mainKey]: {
+            ...prevData[mainKey],
+            [subKey]: value
+          }
+        };
+      } else {
+        // Handle non-nested properties like 'salary'
+        return {
+          ...prevData,
+          [name]: value
+        };
+      }
+    });
+  
+    console.log("Form data birth_date: ", formData.users.birth_date); // Note: This log may not immediately reflect changes due to the async nature of `setFormData`
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -106,11 +136,12 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error("No token found");
       await axios.patch(`http://localhost:8080/users/update-staff/${encodeURIComponent(staff.s_id)}/${encodeURIComponent(staff.users.role)}`, {
-        Fname: formData.users.Fname,
+        Fname: formData.Fname,
         Minit: formData.users.Minit,
         Lname: formData.users.Lname,
         birth_date: new Date(formData.users.birth_date),
         phone: formData.users.phone,
+        job: formData.jobs.job_id,
         // email: updatedStaff.users.email,
         salary: formData.salary,
         qualifications: formData.qualifications
@@ -122,6 +153,17 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
       onUpdate(formData);
       setSuccessMessage('Profile updated successfully.');
+
+
+      await axios.post(`http://localhost:8080/jobs/add-new-jobs-history`, {
+        job_id: parseInt(formData.jobs.job_id),
+        s_id: staff.s_id,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       setTimeout(() => {
         setSuccessMessage('');
         onClose();
@@ -161,7 +203,8 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="firstName"
-                name="firstName"
+                // name="firstName"
+                name = "users.Fname"
                 defaultValue={formData.users.Fname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -172,7 +215,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="mInit"
-                name="mInit"
+                name="users.Minit"
                 defaultValue={formData.users.Minit}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -183,7 +226,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="lastName"
-                name="lastName"
+                name="users.Lname"
                 defaultValue={formData.users.Lname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -194,7 +237,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <div className="relative">
                 <select
                   id="sex"
-                  name="sex"
+                  name="users.sex"
                   defaultValue={formData.users.sex}
                   onChange={handleChange}
                   className="p-3 appearance-none w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -215,7 +258,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="phone"
-                name="phone"
+                name="users.phone"
                 defaultValue={formData.users.phone}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -226,7 +269,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="email"
                 id="email"
-                name="email"
+                name="users.email"
                 value={formData.users.email}
                 readOnly
                 onChange={handleChange}
@@ -234,12 +277,12 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               />
             </div>
             <div className="flex flex-col space-y-2">
-              <label htmlFor="dob" className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
+              <label htmlFor="birth_date" className="text-sm font-semibold text-[#1F2B6C]">Date of Birth</label>
               <input
                 type="date"
-                id="dob"
-                name="dob"
-                value={formData.users.birth_date}
+                id="birth_date"
+                name="users.dob"
+                value={new Date (formData.users.birth_date).toISOString().split("T")[0]}
                 onChange={handleChange}
                 max={today}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -249,7 +292,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
               <select
                 id="job"
-                name="job"
+                name="jobs.job_id"
                 value={formData.jobs.job_id}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -261,11 +304,11 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               </select>
             </div>
             <div className="flex flex-col space-y-2">
-              <label htmlFor="manager_id" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
               <select
-                id="manager_id"
+                id="manager"
                 name="manager_id"
-                value={formData.manager}
+                value={formData.manager_id}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               >
@@ -302,7 +345,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <select
                 id="department"
                 name="department"
-                value={formData.department}
+                value={formData.departments.dept_id}
                 onChange={handleChange}
                 className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
               >
