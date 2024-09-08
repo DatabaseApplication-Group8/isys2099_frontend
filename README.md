@@ -1,24 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Team Members and Contribution Scores:
+1. Nguyen Anh Duy (s3878141) - Contribution Score: 5
+2. Ton Nu Ngoc Khanh (s3932105) - Contribution Score: 5
+3. Tran Vu Quang Anh (s3916566) - Contribution Score: 5
+4. Tran Nhat Tien (s3919657) - Contribution Score: 5
 
-First, run the development server:
+## Github's Organization: 
+https://github.com/DatabaseApplication-Group8 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 1.Install Docker
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 2. Run docker command
+- create network
+- install 2 database servers: mysql + mongo -> docker run …
+Insert 2 SQL + MongoDB scripts into databases
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3.Git clone Frontend & Run
+https://github.com/DatabaseApplication-Group8/isys2099_frontend.git
+- Install packages: npm i
+- Start server: npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 4. Git clone Backend & Run
+https://github.com/DatabaseApplication-Group8/isys2099_backend.git
+- Initialise prisma: npx prisma db pull -> npx prisma generate
+- Start server: npm run start:dev
+
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to the home of Hospital Management System
 
 ## Supported Libraries:
 1. FontAwesome
