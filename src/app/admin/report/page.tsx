@@ -124,13 +124,7 @@ export default function AdminDashboard() {
 
   const handleViewDoctorWork = async () => {
     if (!validateDateRange()) return;
-    // await fetchData(
-    //   "/api/doctor-work",
-    //   { startDate, endDate },
-    //   setDoctorWork,
-    //   "treatmentDate",
-    //   "doctorWork"
-    // );
+
     const response = await axios.get(
       `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
       {
@@ -261,31 +255,11 @@ export default function AdminDashboard() {
           )}
 
         {allPatientTreatments.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          <div className="bg-white p-6 text-black mb-6 mt-4 shadow-md rounded-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
               All Patient Treatments
             </h2>
-            {/*<Table
-              columns={[
-                "Treatment Id",
-                "Patient Id",
-                "Doctor Id",
-                "Description",
-                "Treatment Date",
-                "Start Time",
-                "End Time",
-                "Billing",
-              ]}
-              data={allPatientTreatments.map((treatment) => ({
-                ...treatment,
-                status: (
-                  <span className={getStatusClass(treatment.status)}>
-                    {treatment.status}
-                  </span>
-                ),
-              }))}
-            />*/}
-            <table className="bg-white rounded-md text-left w-full">
+            <table className="border-2 border-solid border-[#1F2B6C] bg-white rounded-md text-left w-full">
               <thead className="bg-[#1F2B6C] text-white">
                 <tr>
                   <th className="py-3 px-4 border-b">Treatment Id</th>
@@ -323,26 +297,11 @@ export default function AdminDashboard() {
         )}
 
         {doctorWork.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          <div className="bg-white p-6 text-black mb-6 mt-4 shadow-md rounded-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Doctor Work Report
             </h2>
-            
-            {/* <Table
-              columns={[
-                "Doctor ID",
-                "Patient ID",
-                "Treatment Date",
-                "Treatment ID",
-              ]}
-              data={doctorWork.map((treatment) => ({
-                DoctorID: treatment.doctor_id, // Assuming 'doctor_id' is the correct attribute from your backend
-                PatientID: treatment.p_id, // Assuming 'p_id' is the correct attribute from your backend
-                TreatmentDate: treatment.treatment_date, // Display the date of the treatment
-                TreatmentID: treatment.t_id, // Assuming 't_id' is the correct attribute from your backend
-              }))}
-            /> */}
-            <table className="bg-white rounded-md text-left w-full">
+            <table className="border-2 border-solid border-[#1F2B6C] bg-white rounded-md text-left w-full">
               <thead className="bg-[#1F2B6C] text-white">
                 <tr>
                   <th className="py-3 px-4 border-b">Doctor Id</th>
@@ -367,37 +326,11 @@ export default function AdminDashboard() {
           </div>
         )}
         {jobChangeHistory.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          <div className="bg-white p-6 text-black mb-6 mt-4 shadow-md rounded-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Job Change History
             </h2>
-
-            {/*<Table
-              columns={["Staff ID", "Change Date", "Previous Role", "New Role"]}
-              data={jobChangeHistory
-                // Sort by start_date to ensure the order is correct for processing
-                .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-                // Reduce the array to pairs of job history entries
-                .reduce((acc, curr, index, src) => {
-                  if (index > 0) {
-                    // Skip the first entry because it can't form a pair with a previous one
-                    const prev = src[index - 1];
-                    if (prev.s_id === curr.s_id) {
-                      // Ensure it's the same staff
-                      acc.push({
-                        staffId: curr.s_id,
-                        changeDate: curr.start_date, // Date of the current entry
-                        previousRole: prev.jobs.job_title, // Role from the previous entry
-                        newRole: curr.jobs.job_title, // Role from the current entry
-                      });
-                    }
-                  }
-                  return acc;
-                }, [])}
-            /> */}
-
-
-            <table className="bg-white rounded-md text-left w-full">
+            <table className="border-2 border-solid border-[#1F2B6C] bg-white rounded-md text-left w-full">
               <thead className="bg-[#1F2B6C] text-white">
                 <tr>
                   <th className="py-3 px-4 border-b">Staff ID</th>

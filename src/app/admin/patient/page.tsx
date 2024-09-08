@@ -32,6 +32,15 @@ export default function Patient() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -75,24 +84,6 @@ export default function Patient() {
       setFilteredPatient(null);
       setErrorMessage("No patient found with the provided ID.");
     }
-
-    // if (patient) {
-
-    //     const accessToken = localStorage.getItem("accessToken");
-    //     const response = await axios.get(`http://localhost:8080/patient/?name=${searchId}`, {
-    //       headers: {
-    //         Authorization: `Bearer ${accessToken}`,
-    //       },
-    //     });
-    //     console.log("wewe")
-    //     console.log(response.data)
-    //     setFilteredPatient(response.data.data);
-    //     setSuccessMessage('Patient found.');
-    //     setErrorMessage(null);
-    // } else {
-    //     setFilteredPatient(null);
-    //     setErrorMessage('No patient found with the provided ID.');
-    // }
   };
 
   return (
@@ -118,7 +109,7 @@ export default function Patient() {
             </button>
           </div>
 
-         
+
         </div>
         <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto">
           <table className="rounded-md text-left w-full">
@@ -155,7 +146,9 @@ export default function Patient() {
                     </td>
                     <td className="text-black py-2 px-4 border-b">{patient.users.email}</td>
                     <td className="text-black py-2 px-4 border-b">{patient.users.phone}</td>
-                    <td className="text-black py-2 px-4 border-b">{patient.users.birth_date.slice(0,10)}</td>
+                    <td className="text-black py-2 px-4 border-b">
+                      {formatDate(patient.users.birth_date)}
+                    </td>
                     <td className="text-black py-2 px-4 border-b">
                       {patient.users.patients.address ? patient.users.patients.address : "N/A"}
                     </td>
@@ -223,15 +216,14 @@ export default function Patient() {
                               <td className="py-2 px-4 border-b">{treatment.time}</td>
                               <td className="py-2 px-4 border-b">{treatment.doctor}</td>
                               <td
-                                className={`py-2 px-4 border-b ${
-                                  treatment.status === "completed"
+                                className={`py-2 px-4 border-b ${treatment.status === "completed"
                                     ? "text-green-500"
                                     : treatment.status === "canceled"
-                                    ? "text-red-500"
-                                    : treatment.status === "pending"
-                                    ? "text-blue-500"
-                                    : "text-gray-500"
-                                }`}
+                                      ? "text-red-500"
+                                      : treatment.status === "pending"
+                                        ? "text-blue-500"
+                                        : "text-gray-500"
+                                  }`}
                               >
                                 {treatment.status}
                               </td>

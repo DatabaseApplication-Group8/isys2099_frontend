@@ -1,7 +1,5 @@
-"use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { set } from "react-datepicker/dist/date_utils";
 
 interface Schedule {
   scheduled_id: string;
@@ -50,26 +48,6 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({
   }, []);
 
   useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          setLoading(false);
-          throw new Error("No access token found.");
-        }
-
-        const scheduled_id = parseInt(
-          localStorage.getItem("scheduled_id") ?? ""
-        );
-        console.log(scheduled_id);
-        // Fetch schedule logic here
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchSchedule();
-
     const today = new Date();
     const minDate = today.toISOString().split("T")[0];
 
@@ -99,48 +77,46 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({
     setFormData((prevData) => {
       const newData = { ...prevData, [id]: value };
 
-      if (id === "startTime" && newData.date) {
-        const startTime = new Date(`${newData.date}T${value}`);
-        // Ensure that endTime is always later than startTime
-        const maxEndTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000) // Add 2 hours
-          .toISOString()
-          .split("T")[1]
-          .slice(0, 5);
+      if (id === "scheduled_date") {
+        const selectedDate = new Date(value);
+        const today = new Date();
+
+        if (selectedDate.toDateString() === today.toDateString()) {
+          const now = new Date();
+          const minTime = now.toTimeString().split(" ")[0].slice(0, 5);
+          setTimeConstraints(prevConstraints => ({
+            ...prevConstraints,
+            minTime,
+          }));
+        } else {
+          setTimeConstraints(prevConstraints => ({
+            ...prevConstraints,
+            minTime: "00:00", // No minTime constraint for future dates
+          }));
+        }
+      }
+
+      if (id === "startTime") {
+        const startTime = new Date(`${newData.scheduled_date}T${value}`);
+  
 
         return {
           ...newData,
           endTime:
-            newData.endTime &&
-            new Date(`${newData.date}T${newData.endTime}`) <= startTime
-              ? "" // Clear endTime if it's not valid
+            newData.endTime <= value
+              ? ""
               : newData.endTime,
-          maxEndTime,
         };
-      }
-
-      if (id === "endTime" && newData.date) {
-        const startTime = new Date(`${newData.date}T${newData.startTime}`);
-        const endTime = new Date(`${newData.date}T${value}`);
-
-        // Ensure that endTime is always later than startTime
-        if (endTime <= startTime) {
-          setErrorMessage("End time must be after start time.");
-        } else {
-          setErrorMessage("");
-        }
       }
       return newData;
     });
-    console.log("formData test:", formData);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
-    const startTime = new Date(
-      `${formData.scheduled_date}T${formData.startTime}`
-    );
+    const startTime = new Date(`${formData.scheduled_date}T${formData.startTime}`);
     const endTime = new Date(`${formData.scheduled_date}T${formData.endTime}`);
 
     if (endTime <= startTime) {
@@ -154,42 +130,12 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({
       if (!token) throw new Error("No token found");
       console.log("userid:", userId);
 
-      const today = new Date();
-      const startTimeString = formData.startTime; // Assume this is '15:00' (3:00 PM)
-      const endTimeString = formData.endTime; // Assume this is '17:00' (5:00 PM)
-
-      // Create dates in UTC
-      const startTime = new Date(
-        Date.UTC(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate(),
-          parseInt(startTimeString.split(":")[0]),
-          parseInt(startTimeString.split(":")[1])
-        )
-      );
-
-      const endTime = new Date(
-        Date.UTC(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate(),
-          parseInt(endTimeString.split(":")[0]),
-          parseInt(endTimeString.split(":")[1])
-        )
-      );
-
-      console.log("start time:", startTime);
-      console.log("end time:", endTime);
-      console.log("scheduled date:", new Date(formData.scheduled_date));
-      await axios.post(
-        `http://localhost:8080/staff/add-new-schedule/${encodeURIComponent(
-          userId
-        )}`,
+      const response = await axios.post(
+        `http://localhost:8080/staff/add-new-schedule/${encodeURIComponent(userId)}`,
         {
           scheduled_date: new Date(formData.scheduled_date),
-          start_time: new Date(startTime),
-          end_time: new Date(endTime),
+          start_time: new Date(`${formData.scheduled_date}T${formData.startTime}:00Z`),
+          end_time: new Date(`${formData.scheduled_date}T${formData.endTime}:00Z`),
           description: formData.description,
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -295,16 +241,15 @@ const CreateSchedule: React.FC<CreateScheduleProps> = ({
           <div className="flex justify-end mt-6 space-x-5">
             <button
               type="submit"
-              className="h-11 w-[190px] rounded-full text-white bg-[#1F2B6C] flex items-center justify-center whitespace-nowrap hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-[#1F2B6C] text-white px-4 py-2 rounded-md"
               disabled={loading}
             >
-              {loading ? "Submitting..." : "Create Schedule"}
+              {loading ? "Creating..." : "Create Schedule"}
             </button>
             <button
               type="button"
-              className="h-11 w-[155px] border-2 border-[#C5DCFF] rounded-full text-[#1F2B6C] bg-white flex items-center justify-center hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={onClose}
-              disabled={loading}
+              className="bg-gray-300 px-4 py-2 rounded-md"
             >
               Cancel
             </button>

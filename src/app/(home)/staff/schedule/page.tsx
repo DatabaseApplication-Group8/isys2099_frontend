@@ -48,7 +48,7 @@ export default function Schedule() {
     const hours = String(date.getUTCHours()).padStart(2, '0');
     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
-};
+  };
   useEffect(() => {
 
     console.log("Updated appointment state: ", appointments);
@@ -56,8 +56,8 @@ export default function Schedule() {
 
   useEffect(() => {
     console.log("Updated treatment state: ", treatments);
-  } , [treatments]);  // This will log only once when the component mounts.
-  
+  }, [treatments]);  // This will log only once when the component mounts.
+
   const fetchData = async () => {
     try {
       const id = localStorage.getItem("id");
@@ -171,10 +171,7 @@ export default function Schedule() {
                       Description
                     </th>
 
-{/* <!--                     <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">End Time</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Description</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Actions</th> --> */}
+                    <th className="py-3 px-4 border-b border-gray-300">Actions</th>
 
                   </tr>
                 </thead>
@@ -183,9 +180,8 @@ export default function Schedule() {
                     personalSchedule.map((item, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        }`}
+                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }`}
                       >
 
                         {/* <td className="py-3 px-4 border-b border-gray-300">
@@ -198,8 +194,8 @@ export default function Schedule() {
                           {item.description}
                         </td> */}
 
-                       <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
-                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.start_time)}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.end_time)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
                         <td className="text-black py-2 px-4 border-b">
                           <button
@@ -207,7 +203,7 @@ export default function Schedule() {
                             className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:bg-blue-900"
                           >
                             Edit
-                          </button> 
+                          </button>
 
                         </td>
                       </tr>
@@ -216,7 +212,7 @@ export default function Schedule() {
                     <tr>
 
                       <td
-                       colSpan="4" className="py-4 text-center text-gray-500"
+                        colSpan="4" className="py-4 text-center text-gray-500"
                       >
                         No personal schedule for this date.
                       </td>
@@ -281,15 +277,14 @@ export default function Schedule() {
                     treatments.map((treatment, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        }`}
+                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }`}
                       >
                         <td className="py-3 px-4 border-b border-gray-300">
-                          {treatment.start_time}
+                          {formatTime(treatment.start_time)}
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
-                          {treatment.end_time}
+                          {formatTime(treatment.end_time)}
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
                           {treatment.p_id}
@@ -340,15 +335,14 @@ export default function Schedule() {
                     appointments.map((appointment, index) => (
                       <tr
                         key={index}
-                        className={`hover:bg-gray-100 transition-colors ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        }`}
+                        className={`hover:bg-gray-100 transition-colors ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                          }`}
                       >
                         <td className="py-3 px-4 border-b border-gray-300">
-                          {appointment.start_time}
+                          {formatTime(appointment.start_time)}
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
-                          {appointment.end_time}
+                          {formatTime(appointment.end_time)}
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
                           {appointment.p_id}
