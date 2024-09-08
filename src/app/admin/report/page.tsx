@@ -25,14 +25,11 @@ type DoctorWork = {
   treatmentId: string;
 };
 
-
 export default function AdminDashboard() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [staffId, setStaffId] = useState("");
-  const [allPatientTreatments, setAllPatientTreatments] = useState<
-    TreatmentHistory[]
-  >([]);
+  const [allPatientTreatments, setAllPatientTreatments] = useState<TreatmentHistory[]>([]);
   const [jobChangeHistory, setJobChangeHistory] = useState<JobChange[]>([]);
   const [doctorWork, setDoctorWork] = useState<DoctorWork[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -63,7 +60,7 @@ export default function AdminDashboard() {
     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
   };
-  // Validate date range
+
   const validateDateRange = () => {
     if (!startDate || !endDate) {
       setDateRangeError("Both start date and end date are required.");
@@ -98,7 +95,7 @@ export default function AdminDashboard() {
       setDataFetched((prev) => ({ ...prev, [key]: true }));
       setErrorMessage(null);
     } catch (error) {
-      //setErrorMessage(`Error fetching data from ${url}.`);
+      setErrorMessage(`Error fetching data from ${url}.`);
     }
   };
 
@@ -121,29 +118,69 @@ export default function AdminDashboard() {
     }
   };
 
-
   const handleViewDoctorWork = async () => {
     if (!validateDateRange()) return;
-    // await fetchData(
-    //   "/api/doctor-work",
-    //   { startDate, endDate },
-    //   setDoctorWork,
-    //   "treatmentDate",
-    //   "doctorWork"
-    // );
-    const response = await axios.get(
-      `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }
-    );
-    console.log(response.data);
-    setDoctorWork(response.data);
-    console.log(doctorWork.length);
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/treatment/by-date-range/${startDate}/${endDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      console.log("Doctor Work:", response.data);
+      setDoctorWork(response.data);
+      setDataFetched((prev) => ({ ...prev, doctorWork: true }));
+    } catch (error) {
+      setErrorMessage("Error fetching doctor work.");
+    }
   };
 
+  {/*const handleViewJobChangeHistory = async () => {
+    if (!staffId) {
+      setErrorMessage("Staff ID is required.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/jobs/find-jobs-history-by-s_id/${staffId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      console.log("Job Change History:", jobChangeHistory);
+
+
+      const sortedAndReducedHistory = response.data
+        .sort((a: any, b: any) => new Date(a.start_date) - new Date(b.start_date))
+        .reduce((acc: JobChange[], curr: any, index: number, src: any[]) => {
+          if (index > 0) {
+            const prev = src[index - 1];
+            if (prev.s_id === curr.s_id) {
+              acc.push({
+                staffId: curr.s_id,
+                changeDate: curr.start_date,
+                previousRole: prev.jobs.job_title,
+                newRole: curr.jobs.job_title,
+              });
+            }
+          }
+          return acc;
+        }, []);
+
+      console.log("Sorted and Reduced Job Change History:", sortedAndReducedHistory);
+      setJobChangeHistory(sortedAndReducedHistory);
+      setErrorMessage(null);
+      setDataFetched((prev) => ({ ...prev, jobChangeHistory: true }));
+    } catch (error) {
+      setErrorMessage("Error fetching job change history.");
+    }
+  };*/}
 
   const handleViewJobChangeHistory = async () => {
     if (!staffId) {
@@ -161,6 +198,7 @@ export default function AdminDashboard() {
         }
       );
 
+      console.log('Original jobChangeHistory:', jobChangeHistory);
       setJobChangeHistory(response.data);
       setErrorMessage(null);
       setDataFetched((prev) => ({ ...prev, jobChangeHistory: true }));
@@ -168,6 +206,8 @@ export default function AdminDashboard() {
       setErrorMessage("Error fetching job change history.");
     }
   };
+
+
 
   return (
     <main className="admin-dashboard bg-[#E6F0FF] min-h-screen pt-4">
@@ -229,7 +269,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="w-full flex justify-center">
-              <button className="w-full bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors"
+              <button className="w-full bg-[#1F2B6C] text-white px-4 py-2 rounded-lg hover:bg-[#153C6B] transition-colors mt-6"
                 onClick={handleViewJobChangeHistory}>
                 View Job Change History
               </button>
@@ -238,210 +278,128 @@ export default function AdminDashboard() {
         </div>
 
         {errorMessage && (
-          <div className="text-red-500 mb-6 text-center">{errorMessage}</div>
-        )}
-
-        {dataFetched.allPatientTreatments && allPatientTreatments.length === 0 && startDate && endDate && (
-          <div className="text-gray-500 mb-6 text-center">
-            No treatments found for the selected date range.
+          <div className="text-red-500 mb-4 text-center">
+            {errorMessage}
           </div>
         )}
 
-        {doctorWork && doctorWork.length === 0 && (
-          <div className="text-gray-500 mb-6 text-center">
-            No doctor work records found for the selected date range.
-          </div>
-        )}
-        {dataFetched.jobChangeHistory &&
-          jobChangeHistory.length === 0 &&
-          staffId && (
-            <div className="text-gray-500 mb-6 text-center">
-              No job change history found for the given staff ID.
+        <div className="tables-container">
+          {dataFetched.allPatientTreatments && allPatientTreatments.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                All Patient Treatments
+              </h2>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {allPatientTreatments.map((treatment) => (
+                    <tr key={treatment.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{treatment.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(treatment.date)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatTime(treatment.time)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{treatment.doctor}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{treatment.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
-        {allPatientTreatments.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              All Patient Treatments
-            </h2>
-            {/*<Table
-              columns={[
-                "Treatment Id",
-                "Patient Id",
-                "Doctor Id",
-                "Description",
-                "Treatment Date",
-                "Start Time",
-                "End Time",
-                "Billing",
-              ]}
-              data={allPatientTreatments.map((treatment) => ({
-                ...treatment,
-                status: (
-                  <span className={getStatusClass(treatment.status)}>
-                    {treatment.status}
-                  </span>
-                ),
-              }))}
-            />*/}
-            <table className="bg-white rounded-md text-left w-full">
-              <thead className="bg-[#1F2B6C] text-white">
-                <tr>
-                  <th className="py-3 px-4 border-b">Treatment Id</th>
-                  <th className="py-3 px-4 border-b">Patient Id</th>
-                  <th className="py-3 px-4 border-b">Doctor Id</th>
-                  <th className="py-3 px-4 border-b">Description</th>
-                  <th className="py-3 px-4 border-b">Treatment Date</th>
-                  <th className="py-3 px-4 border-b">Start Time</th>
-                  <th className="py-3 px-4 border-b">End Time</th>
-                  <th className="py-3 px-4 border-b">Billing</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allPatientTreatments.map((treatment) => (
-                  <tr key={treatment.id}>
-                    <td className="py-2 px-4 border-b">{treatment.t_id}</td>
-                    <td className="py-2 px-4 border-b">{treatment.p_id}</td>
-                    <td className="py-2 px-4 border-b">{treatment.doctor_id}</td>
-                    <td className="py-2 px-4 border-b">{treatment.description}</td>
-                    <td className="py-2 px-4 border-b">
-                      {formatDate(treatment.treatment_date)}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {formatTime(treatment.start_time)}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {formatTime(treatment.end_time)}
-                    </td>
-                    <td className="py-2 px-4 border-b">{treatment.billing}</td>
+          {dataFetched.doctorWork && doctorWork.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                Doctor Work
+              </h2>
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Treatment Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Treatment ID</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {doctorWork.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              Doctor Work Report
-            </h2>
-            
-            {/* <Table
-              columns={[
-                "Doctor ID",
-                "Patient ID",
-                "Treatment Date",
-                "Treatment ID",
-              ]}
-              data={doctorWork.map((treatment) => ({
-                DoctorID: treatment.doctor_id, // Assuming 'doctor_id' is the correct attribute from your backend
-                PatientID: treatment.p_id, // Assuming 'p_id' is the correct attribute from your backend
-                TreatmentDate: treatment.treatment_date, // Display the date of the treatment
-                TreatmentID: treatment.t_id, // Assuming 't_id' is the correct attribute from your backend
-              }))}
-            /> */}
-            <table className="bg-white rounded-md text-left w-full">
-              <thead className="bg-[#1F2B6C] text-white">
-                <tr>
-                  <th className="py-3 px-4 border-b">Doctor Id</th>
-                  <th className="py-3 px-4 border-b">Patient Id</th>
-                  <th className="py-3 px-4 border-b">Treatment Date</th>
-                  <th className="py-3 px-4 border-b">Treatment ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {doctorWork.map((treatment) => (
-                  <tr key={treatment.id}>
-                    <td className="py-2 px-4 border-b">{treatment.doctor_id}</td>
-                    <td className="py-2 px-4 border-b">{treatment.p_id}</td>
-                    <td className="py-2 px-4 border-b">
-                      {formatDate(treatment.treatment_date)}
-                    </td>
-                    <td className="py-2 px-4 border-b">{treatment.t_id}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {jobChangeHistory.length > 0 && (
-          <div className="text-black mt-4">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-              Job Change History
-            </h2>
-
-            {/*<Table
-              columns={["Staff ID", "Change Date", "Previous Role", "New Role"]}
-              data={jobChangeHistory
-                // Sort by start_date to ensure the order is correct for processing
-                .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-                // Reduce the array to pairs of job history entries
-                .reduce((acc, curr, index, src) => {
-                  if (index > 0) {
-                    // Skip the first entry because it can't form a pair with a previous one
-                    const prev = src[index - 1];
-                    if (prev.s_id === curr.s_id) {
-                      // Ensure it's the same staff
-                      acc.push({
-                        staffId: curr.s_id,
-                        changeDate: curr.start_date, // Date of the current entry
-                        previousRole: prev.jobs.job_title, // Role from the previous entry
-                        newRole: curr.jobs.job_title, // Role from the current entry
-                      });
-                    }
-                  }
-                  return acc;
-                }, [])}
-            /> */}
-
-
-            <table className="bg-white rounded-md text-left w-full">
-              <thead className="bg-[#1F2B6C] text-white">
-                <tr>
-                  <th className="py-3 px-4 border-b">Staff ID</th>
-                  <th className="py-3 px-4 border-b">Date Change</th>
-                  <th className="py-3 px-4 border-b">Previous Job</th>
-                  <th className="py-3 px-4 border-b">New Job</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobChangeHistory
-                  // Sort by start_date to ensure the order is correct for processing
-                  .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-                  // Reduce the array to pairs of job history entries
-                  .reduce((acc, curr, index, src) => {
-                    if (index > 0) {
-                      // Skip the first entry because it can't form a pair with a previous one
-                      const prev = src[index - 1];
-                      if (prev.s_id === curr.s_id) {
-                        // Ensure it's the same staff
-                        acc.push({
-                          staffId: curr.s_id,
-                          changeDate: curr.start_date, // Date of the current entry
-                          previousRole: prev.jobs.job_title, // Role from the previous entry
-                          newRole: curr.jobs.job_title, // Role from the current entry
-                        });
-                      }
-                    }
-                    return acc;
-                  }, [])
-                  .map((entry, index) => (
-                    <tr key={index}>
-                      <td className="py-2 px-4 border-b">{entry.staffId}</td>
-                      <td className="py-2 px-4 border-b">{formatDate(entry.changeDate)}</td>
-                      <td className="py-2 px-4 border-b">{entry.previousRole}</td>
-                      <td className="py-2 px-4 border-b">{entry.newRole}</td>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {doctorWork.map((work) => (
+                    <tr key={work.treatmentId}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{work.doctorId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{work.patientId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(work.treatmentDate)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{work.treatmentId}</td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
+          )}
 
-          </div>
-        )}
+          {dataFetched.jobChangeHistory && jobChangeHistory.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                Job Change History
+              </h2>
+
+
+              <table className="bg-white rounded-md text-left w-full">
+                <thead className="bg-[#1F2B6C] text-white">
+                  <tr>
+                    <th className="py-3 px-4 border-b">Staff ID</th>
+                    <th className="py-3 px-4 border-b">Date Change</th>
+                    <th className="py-3 px-4 border-b">Previous Job</th>
+                    <th className="py-3 px-4 border-b">New Job</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jobChangeHistory
+                    // Sort by start_date to ensure the order is correct for processing
+                    .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
+                    // Reduce the array to pairs of job history entries
+                    .reduce((acc, curr, index, src) => {
+                      if (index > 0) {
+                        // Skip the first entry because it can't form a pair with a previous one
+                        const prev = src[index - 1];
+                        if (prev.s_id === curr.s_id) {
+                          // Ensure it's the same staff
+                          const entry = {
+                            staffId: curr.s_id,
+                            changeDate: formatDate(curr.start_date), // Date of the current entry
+                            previousRole: prev.jobs.job_title, // Role from the previous entry
+                            newRole: curr.jobs.job_title, // Role from the current entry
+                          };
+                          console.log('Reduced Entry:', entry); // Log the reduced entry for debugging
+                          acc.push(entry);
+                        }
+                      }
+                      return acc;
+                    }, [])
+                    .map((entry, index) => {
+                      console.log(`Rendering Row ${index + 1}:`, entry); // Log each row data for debugging
+                      return (
+                        <tr key={index}>
+                          <td className="py-2 px-4 border-b">{entry.staffId}</td>
+                          <td className="py-2 px-4 border-b">{formatDate(entry.changeDate)}</td>
+                          <td className="py-2 px-4 border-b">{entry.previousRole}</td>
+                          <td className="py-2 px-4 border-b">{entry.newRole}</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+
+
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
-
 }
