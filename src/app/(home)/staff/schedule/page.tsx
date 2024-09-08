@@ -1,9 +1,14 @@
 "use client";
+
 import React, { useState, useEffect, use } from "react";
 import UpdateSchedule from "@/components/UpdateSchedule/page";
 import axios from "axios";
 import { Appointment, PersonalScheduleItem, Treatment } from "@/types/user";
 import { set } from "react-datepicker/dist/date_utils";
+
+
+import CreateSchedule from '@/components/CreateSchedule/page';
+
 
 // Define types for your schedule data
 interface ScheduleItem {
@@ -22,11 +27,30 @@ export default function Schedule() {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
+
   const [treatments, setTreatment] = useState<Treatment[]>([]);
   const [appointments, setAppointment] = useState<Appointment[]>([]);
   const [userId, setUserId] = useState<number>(0);
 
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [scheduleToUpdate, setScheduleToUpdate] = useState<PersonalScheduleItem | null>(null);
+
+
+  const handleUpdateClick = (schedule: PersonalScheduleItem) => {
+    setScheduleToUpdate(schedule);
+    setShowUpdateForm(true);
+  };
+
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '';
+    const date = new Date(timeString);
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+};
   useEffect(() => {
+
     console.log("Updated appointment state: ", appointments);
   }, [appointments, treatments]);  // This will log every time `appointment` changes.
 
@@ -80,6 +104,7 @@ export default function Schedule() {
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to load schedule data.");
+
     }
   };
 
@@ -91,9 +116,13 @@ export default function Schedule() {
     setSelectedDate(e.target.value);
   };
 
-  const handleUpdateSchedule = () => {
-    // Add logic to update personal schedule here
-    setShowUpdateForm(true);
+  const handleUpdateSchedule = (updatedData: PersonalScheduleItem) => {
+    setSuccessMessage(`Schedule updated successfully.`);
+    // Logic for updating schedule
+  };
+
+  const handleCreateSchedule = () => {
+    setShowCreateForm(true);
   };
 
   const filteredAppointments = appointments.filter(
@@ -117,7 +146,7 @@ export default function Schedule() {
             id="date"
             value={selectedDate}
             onChange={handleDateChange}
-            className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-black p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -131,6 +160,7 @@ export default function Schedule() {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
+
                     <th className="py-3 px-4 border-b border-gray-300">
                       Start Time
                     </th>
@@ -140,6 +170,12 @@ export default function Schedule() {
                     <th className="py-3 px-4 border-b border-gray-300">
                       Description
                     </th>
+
+<!--                     <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
+                    <th className="py-3 px-4 border-b border-gray-300">End Time</th>
+                    <th className="py-3 px-4 border-b border-gray-300">Description</th>
+                    <th className="py-3 px-4 border-b border-gray-300">Actions</th> -->
+
                   </tr>
                 </thead>
                 <tbody>
@@ -151,6 +187,7 @@ export default function Schedule() {
                           index % 2 === 0 ? "bg-gray-50" : "bg-white"
                         }`}
                       >
+
                         <td className="py-3 px-4 border-b border-gray-300">
                           {item.start_time}
                         </td>
@@ -159,14 +196,26 @@ export default function Schedule() {
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
                           {item.description}
+
+<!--                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
+                        <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
+                        <td className="text-black py-2 px-4 border-b">
+                          <button
+                            onClick={() => handleUpdateClick(item)}
+                            className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:bg-blue-900"
+                          >
+                            Edit
+                          </button> -->
+
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
+
                       <td
-                        colSpan="3"
-                        className="py-4 text-center text-gray-500"
+                       colSpan="4" className="py-4 text-center text-gray-500"
                       >
                         No personal schedule for this date.
                       </td>
@@ -175,24 +224,35 @@ export default function Schedule() {
                 </tbody>
               </table>
             </div>
+
             <div className="mt-4 flex items-center justify-end w-full">
               <button
-                onClick={handleUpdateSchedule}
-                className="bg-[#1F2B6C] text-white py-2 px-4 rounded-lg mb-4 hover:scale-105 hover:shadow-lg"
+                onClick={handleCreateSchedule}
+                className="bg-[#1F2B6C] text-white py-2 px-4 rounded-lg hover:scale-105 hover:shadow-lg"
               >
-                Update Schedule
+                Create Schedule
               </button>
             </div>
-            {showUpdateForm && (
+
+            {showCreateForm && (
+              <CreateSchedule
+                onClose={() => setShowCreateForm(false)} // Correct closing logic for Create form
+                onUpdate={(newSchedule) => setPersonalSchedule([...personalSchedule, newSchedule])} // Add new schedule
+              />
+            )}
+
+            {showUpdateForm && scheduleToUpdate && (
               <UpdateSchedule
+                schedule={scheduleToUpdate}
+                onUpdate={(updatedData) => handleUpdateSchedule(updatedData)} // Update schedule logic
                 onClose={() => setShowUpdateForm(false)}
-                // Pass other necessary props here
               />
             )}
           </div>
         </div>
 
         <div className="w-[60%]">
+          {/* Treatments Section */}
           <div className="grid grid-rows-1 lg:grid-rows-2 gap-6">
             <div className="bg-white rounded-lg shadow-lg p-4 h-[300px] overflow-y-auto">
               <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">
@@ -252,6 +312,7 @@ export default function Schedule() {
               </table>
             </div>
 
+            {/* Appointments Section */}
             <div className="bg-white rounded-lg shadow-lg p-4 h-[300px] overflow-y-auto">
               <h2 className="text-2xl font-semibold mb-4 text-[#1F2B6C]">
                 Appointments on {selectedDate}
@@ -312,7 +373,6 @@ export default function Schedule() {
           </div>
         </div>
       </div>
-      {error && <div className="text-red-500 mt-4">{error}</div>}
     </div>
   );
 }

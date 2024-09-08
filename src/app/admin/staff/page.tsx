@@ -78,20 +78,20 @@ export default function Staff() {
     setNameSortOrder((prevOrder) => (prevOrder === "ASC" ? "DESC" : "ASC"));
   };
 
-  const handleDeleteStaff = (id: number) => {
+  const handleDeleteStaff = async (id: number) => {
     // access token
     const token = localStorage.getItem("accessToken");
+
     if (!token) {
       throw new Error("No access token found.");
       setLoading(false);
       return;
     }
 
-    setStaffList(staffList.filter((s) => s.s_id !== id));
-    setFilteredStaff(filteredStaff.filter((s) => s.s_id !== id));
+    console.log("Staff id:", id)
 
-    const response = axios.delete(
-      `http://localhost:8080/staff/${encodeURIComponent(id)}`,
+    const response = await axios.delete(
+      `http://localhost:8080/staff/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -99,7 +99,11 @@ export default function Staff() {
       }
     );
 
-    setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
+    if (response) {
+      setStaffList(staffList.filter((s) => s.s_id !== id));
+      setFilteredStaff(filteredStaff.filter((s) => s.s_id !== id));
+      setSuccessMessage(`Staff with ID ${id} deleted successfully.`);
+    }
   };
 
   const handleUpdateClick = (staff: IStaff) => {
@@ -167,8 +171,8 @@ export default function Staff() {
           </div>
         ) : (
           <div className="staff-database-container bg-white rounded-lg shadow-lg mb-6">
-            <table className="w-full rounded-md text-left h-[500px] overflow-y-auto block">
-              <thead className="bg-[#1F2B6C] text-white w-full">
+            <table className="w-full rounded-md text-left">
+              <thead className="bg-[#1F2B6C] text-white">
                 <tr>
                   <th className="py-2 px-4 border-b">ID</th>
                   <th
@@ -197,7 +201,7 @@ export default function Staff() {
                         {staff.users.Fname} {staff.users.Lname}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
-                        {staff.jobs.job_id}
+                        {staff.jobs.job_title} 
                       </td>
                       <td className="text-black py-2 px-4 border-b">
                         {staff.users.email}
@@ -206,7 +210,7 @@ export default function Staff() {
                         {staff.departments.dept_name}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
-                        {staff.qualifications}
+                        {staff.qualifications ? staff.qualifications : "N/A"}
                       </td>
                       <td className="text-black py-2 px-4 border-b">
                         {staff.salary}

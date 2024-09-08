@@ -168,7 +168,6 @@ export default function Appointment() {
             }</span> to <span style="color: red;">${response.data.data.end_time.slice(11, 16) || "N/A"}</span><br/>
             With staff: <span style="color: red;">${response.data.data.staff.users.Fname || "N/A"}</span><br/>
             At location: <span style="color: red;">${response.data.data.location || "N/A"}</span><br/>
-            Note: <span style="color: red;">${formData.note || "N/A"}</span>
         `);
 
       // Reset form data

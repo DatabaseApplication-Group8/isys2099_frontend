@@ -234,15 +234,15 @@ export default function Profile() {
               <h2 className="text-3xl font-semibold text-gray-900">Appointment</h2>
             </div>
             <div className="appointment-container bg-white rounded-lg shadow-lg overflow-y-auto">
-              <table className="w-full text-left h-72">
+              <table className="w-full text-left">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
                     <th className="py-2 px-4 border-b">Date</th>
-                    <th className="py-2 px-4 border-b">Purpose</th>
                     <th className="py-2 px-4 border-b">Start Time</th>
                     <th className="py-2 px-4 border-b">End Time</th>
                     <th className="py-2 px-4 border-b">Staff</th>
                     <th className="py-2 px-4 border-b">Location</th>
+                    <th className="py-2 px-4 border-b">Purpose</th>
                     <th className="py-2 px-4 border-b">Status</th>
                   </tr>
                 </thead>
@@ -251,11 +251,11 @@ export default function Profile() {
                     appointments.map((appointment) => (
                       <tr key={appointment.appointment_id}>
                         <td className="py-2 px-4 border-b text-black">{appointment.meeting_date.slice(0, 10)}</td>
-                        <td className="py-2 px-4 border-b text-black">{appointment.purpose}</td>
                         <td className="py-2 px-4 border-b text-black">{appointment.start_time.slice(11, 16)}</td>
                         <td className="py-2 px-4 border-b text-black">{appointment.end_time.slice(11, 16)}</td>
                         <td className="py-2 px-4 border-b text-black">{appointment.staff.users.Fname}</td>
                         <td className="py-2 px-4 border-b text-black">{appointment.location}</td>
+                        <td className="py-2 px-4 border-b text-black">{appointment.purpose}</td>
                         <td className="py-2 px-4 border-b text-black">
                           {appointment.meeting_status === true ? (
                             new Date(appointment.meeting_date) > new Date() ? (
@@ -315,7 +315,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Treatment and Appointment Sections */}
         <div className="lg:w-[50%] flex flex-col gap-6">
           <div className="filter-section bg-white p-6 rounded-lg shadow-lg mb-2">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
@@ -352,7 +351,7 @@ export default function Profile() {
               <h2 className="text-3xl font-semibold text-gray-900">Treatment</h2>
             </div>
             <div className="treatment-container bg-white rounded-lg shadow-lg overflow-y-auto">
-              <table className="w-full text-left h-72">
+              <table className="w-full text-left">
                 <thead className="bg-[#1F2B6C] text-white">
                   <tr>
                     <th className="py-2 px-4 border-b">Date</th>
