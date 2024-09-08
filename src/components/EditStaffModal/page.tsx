@@ -117,10 +117,10 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-  
+
     // Assuming that your form elements' names are prefixed by their nesting level, separated by a dot, e.g., "users.firstName"
     const nameParts = name.split('.');
-  
+
     setFormData(prevData => {
       // Handle nested properties like 'users.firstName'
       if (nameParts.length > 1) {
@@ -161,7 +161,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
         phone: formData.users.phone,
         job_id: parseInt(formData.job_id),
         manager_id: parseInt(formData.manager_id),
-        dept_id : parseInt(formData.departments.dept_id),
+        dept_id: parseInt(formData.departments.dept_id),
 
         // manager_id: formData.manager,
         // dept_id : formData.departments.dept_id,
@@ -226,8 +226,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
               <input
                 type="text"
                 id="firstName"
-                // name="firstName"
-                name = "users.Fname"
+                name="users.Fname"
                 defaultValue={formData.users.Fname}
                 onChange={handleChange}
                 className="p-3 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
@@ -306,11 +305,11 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
 
                 id="birth_date"
                 name="users.dob"
-                value={new Date (formData.users.birth_date).toISOString().split("T")[0]}
+                value={new Date(formData.users.birth_date).toISOString().split("T")[0]}
 
-// <!--                 id="dob"
-//                 name="dob"
-//                 value={formatDate(formData.users.birth_date)} -->
+                // <!--                 id="dob"
+                //                 name="dob"
+                //                 value={formatDate(formData.users.birth_date)} -->
 
                 onChange={handleChange}
                 max={today}
@@ -319,40 +318,11 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="job_id" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
-              <select
-                id="job_id"
-                name="job_id"
-                value={parseInt(formData.job_id)}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">Select job</option>
-                {jobList.map((job) => (
-                  <option key={job.job_id} value={job.job_id}>{job.job_title}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col space-y-2">
-              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
-              <select
-                id="manager"
-                name="manager_id"
-                value={formData.manager_id}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">None</option>
-                {managerList.map((manager) => (
-                  <option key={manager.manager_id} value={manager.manager_id}>{manager.users.username}</option>
-                ))}
-              </select>
-
-{/* <!--               <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
               <div className="relative">
                 <select
-                  id="job"
-                  name="job"
-                  value={formData.jobs.job_id}
+                  id="job_id"
+                  name="job_id"
+                  value={parseInt(formData.job_id)}
                   onChange={handleChange}
                   className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
@@ -367,14 +337,15 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                   </svg>
                 </div>
               </div>
+
             </div>
             <div className="flex flex-col space-y-2">
-              <label htmlFor="manager_id" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
+              <label htmlFor="manager" className="text-sm font-semibold text-[#1F2B6C]">Manager</label>
               <div className="relative">
                 <select
-                  id="manager_id"
+                  id="manager"
                   name="manager_id"
-                  value={formData.manager}
+                  value={formData.manager_id}
                   onChange={handleChange}
                   className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
@@ -388,8 +359,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-              </div> --> */}
-
+              </div>
             </div>
 
             <div className="flex flex-col space-y-2">
@@ -416,25 +386,11 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
             </div>
             <div className="flex flex-col space-y-2">
               <label htmlFor="department" className="text-sm font-semibold text-[#1F2B6C]">Department</label>
-
-              <select
-                id="department"
-                name="department"
-                value={formData.departments.dept_id}
-                onChange={handleChange}
-                className="p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
-              >
-                <option value="">Select department</option>
-                {departmentList.map((department) => (
-                  <option key={department.dept_id} value={department.dept_id}>{department.dept_name}</option>
-                ))}
-              </select>
-
-{/* <!--               <div className="relative">
+              <div className="relative">
                 <select
                   id="department"
                   name="department"
-                  value={formData.department}
+                  value={formData.departments.dept_id}
                   onChange={handleChange}
                   className="appearance-none p-3 w-full border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1F2B6C]"
                 >
@@ -448,7 +404,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-              </div> --> */}
+              </div>
 
             </div>
           </div>
