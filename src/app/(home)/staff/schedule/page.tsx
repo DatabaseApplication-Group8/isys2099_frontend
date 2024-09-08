@@ -171,10 +171,10 @@ export default function Schedule() {
                       Description
                     </th>
 
-<!--                     <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
+{/* <!--                     <th className="py-3 px-4 border-b border-gray-300">Start Time</th>
                     <th className="py-3 px-4 border-b border-gray-300">End Time</th>
                     <th className="py-3 px-4 border-b border-gray-300">Description</th>
-                    <th className="py-3 px-4 border-b border-gray-300">Actions</th> -->
+                    <th className="py-3 px-4 border-b border-gray-300">Actions</th> --> */}
 
                   </tr>
                 </thead>
@@ -197,7 +197,7 @@ export default function Schedule() {
                         <td className="py-3 px-4 border-b border-gray-300">
                           {item.description}
 
-<!--                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
+{/* <!--                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
                         <td className="text-black py-2 px-4 border-b">
@@ -206,7 +206,7 @@ export default function Schedule() {
                             className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:bg-blue-900"
                           >
                             Edit
-                          </button> -->
+                          </button> --> */}
 
                         </td>
                       </tr>

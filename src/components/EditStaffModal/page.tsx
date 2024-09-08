@@ -308,9 +308,9 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 name="users.dob"
                 value={new Date (formData.users.birth_date).toISOString().split("T")[0]}
 
-<!--                 id="dob"
-                name="dob"
-                value={formatDate(formData.users.birth_date)} -->
+// <!--                 id="dob"
+//                 name="dob"
+//                 value={formatDate(formData.users.birth_date)} -->
 
                 onChange={handleChange}
                 max={today}
@@ -347,7 +347,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 ))}
               </select>
 
-<!--               <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
+{/* <!--               <label htmlFor="job" className="text-sm font-semibold text-[#1F2B6C]">Job</label>
               <div className="relative">
                 <select
                   id="job"
@@ -388,7 +388,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-              </div> -->
+              </div> --> */}
 
             </div>
 
@@ -430,7 +430,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                 ))}
               </select>
 
-<!--               <div className="relative">
+{/* <!--               <div className="relative">
                 <select
                   id="department"
                   name="department"
@@ -448,7 +448,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ staff, onClose, onUpdat
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-              </div> -->
+              </div> --> */}
 
             </div>
           </div>

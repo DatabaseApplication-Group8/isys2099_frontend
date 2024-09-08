@@ -353,7 +353,7 @@ export default function AdminDashboard() {
                 placeholder="Staff ID"
               />
             </div>
-<!--                 <div className="flex flex-row gap-12 ">
+{/* <!--                 <div className="flex flex-row gap-12 ">
                     <div className="filter-section w-2/3 bg-white p-6 rounded-lg shadow-lg mb-6">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Filter by given duration</h2>
                         {dateRangeError && (
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
                             </button>
                         </div>
                     </div>
-                </div> -->
+                </div> --> */}
 
             <div className="w-full">
               <Button onClick={handleViewJobChangeHistory}>
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-<!--                 {allPatientTreatments.length > 0 && (
+{/* <!--                 {allPatientTreatments.length > 0 && (
                     <div className="text-black">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">All Patient Treatments</h2>
                         <table className="bg-white rounded-md text-left w-full">
@@ -514,7 +514,7 @@ export default function AdminDashboard() {
                             </tbody>
                         </table>
                     </div>
-                )} -->
+                )} --> */}
 
 
         {/* {allPatientTreatments.length > 0 && (
