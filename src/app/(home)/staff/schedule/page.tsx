@@ -73,7 +73,7 @@ export default function Schedule() {
           }
         );
         setAppointment(response.data);
-        // console.log("Treatment data fetched: ", response.data);
+        console.log("appointment data fetched: ", response.data);
         console.log("Updated appointment state: ", appointments);
 
         const treatments = await axios.get(
@@ -188,7 +188,7 @@ export default function Schedule() {
                         }`}
                       >
 
-                        <td className="py-3 px-4 border-b border-gray-300">
+                        {/* <td className="py-3 px-4 border-b border-gray-300">
                           {item.start_time}
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
@@ -196,8 +196,9 @@ export default function Schedule() {
                         </td>
                         <td className="py-3 px-4 border-b border-gray-300">
                           {item.description}
+                        </td> */}
 
-{/* <!--                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
+                       <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.startTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{formatTime(item.endTime)}</td>
                         <td className="text-black py-3 px-4 border-b border-gray-300">{item.description}</td>
                         <td className="text-black py-2 px-4 border-b">
@@ -206,7 +207,7 @@ export default function Schedule() {
                             className="bg-[#1F2B6C] text-white py-2 px-4 rounded-md hover:bg-blue-900"
                           >
                             Edit
-                          </button> --> */}
+                          </button> 
 
                         </td>
                       </tr>
