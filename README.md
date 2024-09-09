@@ -1,4 +1,3 @@
-
 ## Team Members and Contribution Scores:
 1. Nguyen Anh Duy (s3878141) - Contribution Score: 5
 2. Ton Nu Ngoc Khanh (s3932105) - Contribution Score: 5
@@ -6,6 +5,7 @@
 4. Tran Nhat Tien (s3919657) - Contribution Score: 5
 
 ## Link video:
+https://youtu.be/LnfX38xT1l8
 
 ## Github Organization's link: 
 https://github.com/DatabaseApplication-Group8 
