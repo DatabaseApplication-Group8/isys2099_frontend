@@ -111,7 +111,7 @@ export default function Patient() {
 
 
         </div>
-        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto">
+        <div className="patient-database-container bg-white rounded-lg shadow-lg mb-6 overflow-y-auto" style={{ maxHeight: '500px' }}>
           <table className="rounded-md text-left w-full">
             <thead className="bg-[#1F2B6C] text-white">
               <tr>

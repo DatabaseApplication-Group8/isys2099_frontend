@@ -148,7 +148,7 @@ export default function Treatment() {
             console.log("Form submitted with data:", formData);
 
             setSuccessMessage(`
-                You have successfully made an appointment on <span style="color: red;">${
+                You have successfully book a treatment on <span style="color: red;">${
                   formData.date || "N/A"
                 }</span><br/>
                 Start from: <span style="color: red;">${
