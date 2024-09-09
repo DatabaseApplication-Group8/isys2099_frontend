@@ -10,24 +10,26 @@ https://youtu.be/LnfX38xT1l8
 ## Github Organization's link: 
 https://github.com/DatabaseApplication-Group8 
 
-## 1.Install Docker
+#### 1. Install Database Server using Docker
+(You can install MySQL Community Server and MongoDB Community Server as an alternative for the below approach)
 Follow the Docker installation instructions specific to your operating system from the Docker website (https://www.docker.com/)
 
-## 2. Run docker command
-- create network:
-- Install Database Servers: mysql + mongo -> docker run …
-- Insert SQL and MongoDB Scripts:
+Run docker command
+- Install Database Servers:
+mysql:
+```bash
+$ docker run --name server-isys2099 -e MYSQL_ROOT_PASSWORD=1234 -p 3306:3306 -d mysql
+```
+mongodb: 
+```bash
+$ docker run -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=group8 -e MONGO_INITDB_ROOT_PASSWORD=1234  --name mongo-isys2099 mongo
+```
 
-## 3.Clone and Run Frontend 
-- Clone Repository:
-    git clone https://github.com/DatabaseApplication-Group8/isys2099_frontend.git
-    cd isys2099_frontend
+- Insert SQL script from file "db_isys2099_source.sql" from the backend source:
 
-- Install packages: npm i
+#### 3. Open Backend Folder
+(you can clone it from our repository)
 
-- Start server: npm run dev
-
-## 4. Clone and Run Backend
 - Clone Repository:
     git clone https://github.com/DatabaseApplication-Group8/isys2099_backend.git
     cd isys2099_backend
@@ -38,6 +40,14 @@ Follow the Docker installation instructions specific to your operating system fr
 
 - Start server: npm run start:dev
 
+#### 4. Open Frontend Folder
+- Clone Repository:
+    git clone https://github.com/DatabaseApplication-Group8/isys2099_frontend.git
+    cd isys2099_frontend
+
+- Install packages: npm i
+
+- Start server: npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to the home of Hospital Management System
 
