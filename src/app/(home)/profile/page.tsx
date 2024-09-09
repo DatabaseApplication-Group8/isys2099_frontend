@@ -258,7 +258,8 @@ export default function Profile() {
                         <td className="py-2 px-4 border-b text-black">{appointment.purpose}</td>
                         <td className="py-2 px-4 border-b text-black">
                           {appointment.meeting_status === true ? (
-                            new Date(appointment.meeting_date) > new Date() ? (
+                            new Date(appointment.meeting_date) >
+                            new Date(new Date().setDate(new Date().getDate() - 1)) ? (
                               <button
                                 onClick={() => openModal(appointment.appointment_id, "appointment")}
                                 className="text-blue-500 hover:underline hover:text-blue-700"
